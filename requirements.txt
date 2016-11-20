@@ -1,5 +1,6 @@
 click
 fastavro
+flake8
 flask
 nose
 numpy
