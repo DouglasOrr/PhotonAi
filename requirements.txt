@@ -2,5 +2,6 @@ click
 fastavro
 flake8
 flask
+flask-assets
 nose
 numpy
