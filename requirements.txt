@@ -4,4 +4,5 @@ flake8
 flask
 flask-assets
 nose
+nose-parameterized
 numpy

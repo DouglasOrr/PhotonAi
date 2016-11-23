@@ -1,7 +1,8 @@
 from flask_assets import Bundle, Environment
-from flask import Flask, redirect, url_for, render_template
+from flask import Flask, render_template
 
 app = Flask(__name__)
+
 
 @app.route('/')
 def index():

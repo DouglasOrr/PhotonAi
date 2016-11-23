@@ -3,6 +3,34 @@ import fastavro
 import itertools as it
 
 
+class SimpleViz:
+    '''A simple text log vizualizer for simulations.
+    '''
+    def __call__(self, step):
+        t = step['timestamp']
+        print('# t = %.3f s' % (t / 1000.0))
+        if isinstance(step['data'], dict):
+            # Must be a Universe - reset
+            self._objects = {}
+        else:
+            for event in step['data']:
+                data = event['data']
+                if 'type' in data:
+                    # Create
+                    self._objects[event['id']] = dict(
+                        label='%s[%d]' % (data['type'], event['id']),
+                        position=data['state']['position'])
+                elif 'position' in data:
+                    # Update
+                    self._objects[event['id']]['position'] = data['position']
+                else:
+                    # Destroy
+                    del self.objects[event['id']]
+        for obj in self._objects.values():
+            p = obj['position']
+            print('\t%s (%0.1f, %0.1f)' % (obj['label'], p['x'], p['y']))
+
+
 def test_nothing():
     universe = dict(
         dimensions=dict(x=200, y=100),
@@ -40,7 +68,7 @@ def test_nothing():
         ])
     assert fastavro._writer.validate(step_1, game.Schema.STEP)
 
-    viz = game.SimpleViz()
+    viz = SimpleViz()
     viz(step_0)
     viz(step_1)
 
@@ -73,6 +101,6 @@ def test_engine():
     ]
 
     engine = game.Game(universe, planets, 100)
-    viz = game.SimpleViz()
+    viz = SimpleViz()
     for state in it.islice(engine, 100):
         viz(state)
