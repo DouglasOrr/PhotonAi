@@ -6,7 +6,6 @@ from nose.tools import eq_
 
 
 @parameterized([
-    (world.Vector, test_schema.VECTOR),
     (world.Space, test_schema.Space.CREATE),
     (world.Body, test_schema.Body.CREATE, test_schema.Body.STATE),
     (world.Weapon, test_schema.Weapon.CREATE, test_schema.Weapon.STATE),
@@ -16,9 +15,11 @@ from nose.tools import eq_
     (world.Pellet, test_schema.Pellet.CREATE, test_schema.Pellet.STATE),
 ])
 def test_create_and_update_no_crash(world_cls, create, state=None):
-    obj = world_cls.create(create)
+    obj = world_cls.create(100, create)
+    eq_(obj.update_clock, 100)
     if state is not None:
-        obj.update(state)
+        obj.update(200, state)
+        eq_(obj.update_clock, 200)
     str(obj)
 
 
