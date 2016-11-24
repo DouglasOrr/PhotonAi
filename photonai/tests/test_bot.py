@@ -1,22 +1,33 @@
 from .. import bot
-from . import nothing_bot, test_schema
+from . import bots, test_schema
 import os
 import sys
 from nose.tools import eq_
 from nose_parameterized import parameterized
 
 
-PROJECT_PATH = os.path.abspath(os.path.join(__file__, '../../..'))
+def subprocess_bot(bot_module):
+    project_path = os.path.abspath(os.path.join(__file__, '../../..'))
+    return bot.SubprocessBot(
+        ['env', 'PYTHONPATH=%s' % project_path,
+         'python', bot_module.__file__],
+        stderr=sys.stderr)
+
+
+# c.f. bots/nothing.py
+ZERO_CONTROL = dict(fire=False, rotate=0.0, thrust=0.0)
+
+# c.f. bots/spiral.py
+SPIRAL_CONTROL = dict(fire=True, rotate=-1.0, thrust=1.0)
 
 
 @parameterized([
-    (lambda: nothing_bot.Bot(),),
-    (lambda: bot.SubprocessBot(['env', 'PYTHONPATH=%s' % PROJECT_PATH,
-                                'python', nothing_bot.__file__],
-                               stderr=sys.stderr,),),
+    (lambda: bots.nothing.Bot(), ZERO_CONTROL),
+    (lambda: subprocess_bot(bots.nothing), ZERO_CONTROL),
+    (lambda: bots.spiral.Bot(), SPIRAL_CONTROL),
+    (lambda: subprocess_bot(bots.spiral), SPIRAL_CONTROL),
 ])
-def test_nothing_bot(create):
-    zero_control = dict(fire=False, rotate=0.0, thrust=0.0)
+def test_stateless_bot(create, expected_control):
     bot = create()
 
     eq_(None, bot(dict(
@@ -24,13 +35,13 @@ def test_nothing_bot(create):
         ship_id=None)),
         'no ship to control yet')
 
-    eq_(zero_control, bot(dict(
+    eq_(expected_control, bot(dict(
         step=dict(clock=1, duration=0.01,
                   data=[dict(id=246, data=test_schema.Ship.CREATE)]),
         ship_id=246)),
         'zero control to the ship')
 
-    eq_(zero_control, bot(dict(
+    eq_(expected_control, bot(dict(
         step=dict(clock=2, duration=0.01,
                   data=[dict(id=246, data=test_schema.Ship.STATE)]),
         ship_id=246)),
