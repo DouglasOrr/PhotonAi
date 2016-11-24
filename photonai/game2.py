@@ -1,10 +1,6 @@
 from . import world
 
 
-class Bot:
-    pass
-
-
 class Game:
     '''The game engine.
     '''
@@ -12,7 +8,7 @@ class Game:
         self._world = world.World()
 
     def run(self):
-        '''Get a sequence of log events (according to .schema) by
+        '''Get a sequence of log events (according to .schema.STEP) by
         running the game.
         '''
         pass
