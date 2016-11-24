@@ -1,4 +1,8 @@
-'''Core game log schema.'''
+'''Core game log schema.
+'''
+
+# N.B. When updating this file, make sure you also update the example
+# data in .tests.test_schema & objects in .world
 
 VECTOR = dict(
     type='record',
@@ -19,6 +23,7 @@ class Space:
         fields=[
             dict(name='dimensions', type=VECTOR),
             dict(name='gravity', type='float'),
+            dict(name='lifetime', type='float'),
         ])
 
 

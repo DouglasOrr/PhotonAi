@@ -4,6 +4,11 @@ import subprocess
 from . import schema, world
 
 
+def _safe_flush(writer):
+    writer.flush()
+    writer.block_count = 0  # due to a bug in fastavro (PR #64)
+
+
 class Bot:
     '''A player-defined bot for controlling a ship in the game.
     '''
@@ -45,18 +50,10 @@ class Bot:
         writer = fastavro._writer.Writer(sys.stdout.buffer, Bot.RESPONSE)
         # Make sure no-one else writes to stdout - that would be bad!
         sys.stdout = sys.stderr
-        writer.flush()
-        reader = fastavro.reader(sys.stdin.buffer)
-        while True:
-            try:
-                request = next(reader)
-            except IndexError as e:
-                sys.stderr.write(
-                    'swallowing possible exception (ignore if EOF):'
-                    ' %r\n' % e)
-                break
+        _safe_flush(writer)
+        for request in fastavro.reader(sys.stdin.buffer):
             writer.write(self(request))
-            writer.flush()
+            _safe_flush(writer)
 
 
 class SimpleBot(Bot):
@@ -102,7 +99,7 @@ class SimpleBot(Bot):
 class SubprocessBot(Bot):
     '''A bot that forwards to an Avro stdin/stdout streaming subprocess.
     '''
-    def __init__(self, command, stderr=subprocess.DEVNULL):
+    def __init__(self, command, stderr):
         self._process = subprocess.Popen(
             command,
             stdin=subprocess.PIPE,
@@ -110,7 +107,7 @@ class SubprocessBot(Bot):
             stderr=stderr)
         self._request = fastavro._writer.Writer(
             self._process.stdin, Bot.REQUEST)
-        self._request.flush()
+        _safe_flush(self._request)
         self._response = fastavro.reader(
             self._process.stdout)
 
@@ -122,5 +119,5 @@ class SubprocessBot(Bot):
 
     def __call__(self, request):
         self._request.write(request)
-        self._request.flush()
+        _safe_flush(self._request)
         return next(self._response)

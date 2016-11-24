@@ -7,6 +7,9 @@ from . import schema
 
 
 class Vector:
+    def zero():
+        return np.zeros(2, dtype=np.float)
+
     @staticmethod
     def to_log(v):
         assert v.shape == (2,), 'Expected a 2D numpy.array'
@@ -62,12 +65,13 @@ class Item:
 
 
 class Space(Item):
-    __slots__ = Item.__slots__ + ('dimensions', 'gravity')
+    __slots__ = Item.__slots__ + ('dimensions', 'gravity', 'lifetime')
 
     @staticmethod
     def _read_create(create):
         return dict(dimensions=Vector.create(create['dimensions']),
-                    gravity=float(create['gravity']))
+                    gravity=float(create['gravity']),
+                    lifetime=float(create['lifetime']))
 
 
 class Body(Item):

@@ -30,4 +30,10 @@ def test_nothing_bot(create):
         ship_id=246)),
         'zero control to the ship')
 
+    eq_(zero_control, bot(dict(
+        step=dict(clock=2, duration=0.01,
+                  data=[dict(id=246, data=test_schema.Ship.STATE)]),
+        ship_id=246)),
+        'still zero control to the ship')
+
     bot.close()

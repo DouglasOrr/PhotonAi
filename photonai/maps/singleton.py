@@ -3,7 +3,8 @@ import math
 
 space = dict(
     dimensions=dict(x=150, y=100),
-    gravity=0.01)
+    gravity=0.01,
+    lifetime=100.0)
 
 
 planets = [dict(
@@ -28,11 +29,14 @@ def ship(n, controller):
             position=dict(x=25, y=50),
             velocity=dict(x=0, y=0),
             orientation=math.pi / 2)
-    else:
+    elif n == 1:
         initial_state = dict(
             position=dict(x=125, y=50),
             velocity=dict(x=0, y=0),
             orientation=-math.pi / 2)
+    else:
+        raise ValueError(
+            'Can only place two controllers on this map')
     return dict(
         body=dict(
             radius=1,
