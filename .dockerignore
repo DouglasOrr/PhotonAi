@@ -1,3 +1,4 @@
 __pycache__
-photonai/gen/
+photonai/static/gen/
 photonai/static/.webassets-cache/
+photonai/static/.tmp/

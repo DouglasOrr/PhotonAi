@@ -9,11 +9,16 @@
     {% assets "player_css" %}
         <link rel="stylesheet" href="{{ ASSET_URL }}">
     {% endassets %}
+    <script type="text/javascript" src="/static/js/player.js"></script>
   </head>
   <body>
     <div class="container-fluid">
       <div class="row">
 	<h1>Photonai player</h1>
+      </div>
+      <div class="row">
+        <canvas class="player-canvas" width="1000", height="500">
+        </canvas>
       </div>
     </div>
   </body>

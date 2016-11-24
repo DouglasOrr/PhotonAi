@@ -1,5 +1,6 @@
 __pycache__
 gen/
 .webassets-cache/
+.tmp/
 lib/
 local/
