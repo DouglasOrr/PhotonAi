@@ -9,7 +9,7 @@ from . import schema
 class Vector:
     @staticmethod
     def to_log(v):
-        assert v.shape == (2,), "Expected a 2D numpy.array"
+        assert v.shape == (2,), 'Expected a 2D numpy.array'
         return dict(x=float(v[0]), y=float(v[1]))
 
     @staticmethod
@@ -193,7 +193,7 @@ class World:
             del self.objects[id_]
 
         else:
-            raise ValueError("Unrecognized event %s" % event)
+            raise ValueError('Unrecognized event %s' % event)
 
     def __call__(self, step):
         if validate(step['data'], schema.Space.CREATE):
