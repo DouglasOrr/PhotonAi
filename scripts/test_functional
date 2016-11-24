@@ -1,0 +1,23 @@
+#!/usr/local/bin/python
+
+import subprocess
+import os
+import sys
+
+try:
+    subprocess.run(
+        'python -m photonai'
+        ' photonai/tests/bots/nothing.py'
+        ' photonai/tests/bots/spiral.py'
+        ' /tmp/simulation.avro',
+        shell=True, check=True,
+        stderr=subprocess.PIPE)
+
+except subprocess.CalledProcessError as e:
+    sys.stderr.write('==== Subprocess stderr ====\n')
+    sys.stderr.write(e.stderr.decode('utf8'))
+    sys.stderr.write('===========================\n')
+    raise
+
+
+assert os.path.exists('/tmp/simulation.avro')

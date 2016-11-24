@@ -2,3 +2,4 @@ set -e
 
 ./scripts/run flake8
 ./scripts/run nosetests
+./scripts/run scripts/test_functional
