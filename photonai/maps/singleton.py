@@ -3,12 +3,12 @@ import math
 
 space = dict(
     dimensions=dict(x=150, y=100),
-    gravity=0.01,
+    gravity=0.1,
     lifetime=100.0)
 
 
 planets = [dict(
-    radius=25,
+    radius=20,
     mass=1000,
     state=dict(
         position=dict(x=75, y=50),
@@ -39,7 +39,7 @@ def ship(n, controller):
             'Can only place two controllers on this map')
     return dict(
         body=dict(
-            radius=1,
+            radius=2,
             mass=1,
             state=initial_state),
         weapon=weapon,
