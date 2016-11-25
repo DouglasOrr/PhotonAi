@@ -20,7 +20,7 @@ function draw_planet(ctx, body) {
 function draw_ship(ctx, body, color) {
     // Constants
     var alpha = Math.PI / 4;
-    var bigger_by = 1.5;  // inflate the radius to "match it up"
+    var bigger_by = 1.5;  // inflate the radius to 'match it up'
 
     // Compute vertices & draw
     var p = body.state.position;
@@ -52,8 +52,8 @@ function draw_pellet(ctx, body, space_dimensions) {
 }
 
 function draw(space_dimensions, objects, ship_colors) {
-    var canvas = $(".player-canvas")[0];
-    var ctx = canvas.getContext("2d");
+    var canvas = $('.player-canvas')[0];
+    var ctx = canvas.getContext('2d');
 
     // The content should be centered and top aligned
     // - also flip y so that it runs up from the bottom
@@ -75,9 +75,9 @@ function draw(space_dimensions, objects, ship_colors) {
     Object.keys(objects).forEach(function(id) {
 	var obj = objects[id];
 	if (is_ship(obj)) {
-	    draw_ship(ctx, obj['body'], ship_colors[id]);
+	    draw_ship(ctx, obj.body, ship_colors[id]);
 	} else if (is_pellet(obj)) {
-	    draw_pellet(ctx, obj['body'], space_dimensions);
+	    draw_pellet(ctx, obj.body, space_dimensions);
 	} else {
 	    draw_planet(ctx, obj);
 	}
@@ -86,7 +86,7 @@ function draw(space_dimensions, objects, ship_colors) {
 
 /* Generates color codes to assign to ships. */
 function ship_palette() {
-    var colors = ["#f00", "#0f0", "#22f"];
+    var colors = ['#f00', '#0f0', '#22f'];
     var index = -1;
     return function () {
 	index = (index + 1) % colors.length;
@@ -143,9 +143,9 @@ function log_loaded(log) {
 }
 
 $(function() {
-    var id = "sample";  // TODO
+    var id = 'sample';  // TODO
 
-    $.get({url: "/replay/" + id,
+    $.get({url: '/replay/' + id,
            cache: false
           }).then(log_loaded);
 });
