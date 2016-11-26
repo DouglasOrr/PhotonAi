@@ -12,7 +12,7 @@ def _direction(orientation):
                     dtype=np.float)
 
 
-def _move_body(subject, others, g, dt, forward=None, rotate=0):
+def _move_body(subject, others, space, dt, forward=None, rotate=0):
     accel = world.Vector.zero()
 
     if forward is not None:
@@ -23,7 +23,7 @@ def _move_body(subject, others, g, dt, forward=None, rotate=0):
         for other in others:
             if other is not subject:
                 relative = other.position - subject.position
-                strength = g * other.mass / (relative ** 2).sum()
+                strength = space.gravity * other.mass / (relative ** 2).sum()
                 accel += strength * relative
 
     new_velocity = subject.velocity + dt * accel
@@ -31,6 +31,10 @@ def _move_body(subject, others, g, dt, forward=None, rotate=0):
     new_position = (subject.position +
                     (dt / 2) * subject.velocity +
                     (dt / 2) * new_velocity)
+
+    # Ships should wrap around the world
+    if isinstance(subject, world.Ship):
+        new_position = new_position % space.dimensions
 
     new_orientation = (subject.orientation + dt * rotate) % (2 * math.pi)
 
@@ -101,7 +105,8 @@ def game(map_spec, controller_bots, step_duration):
     def move_body(obj, **args):
         return _move_body(
             obj, world_.objects.values(),
-            g=world_.space.gravity, dt=step_duration,
+            space=world_.space,
+            dt=step_duration,
             **args)
 
     # Setup the world & initial objects
