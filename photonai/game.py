@@ -1,22 +1,13 @@
-from . import world
+from . import world, util
 import itertools as it
 import numpy as np
-import math
-
-
-def _direction(orientation):
-    '''Create a unit direction vector from an orientation "bearing",
-    where orientation=0 is defined as +Y (UP), increases clockwise.
-    '''
-    return np.array([math.sin(orientation), math.cos(orientation)],
-                    dtype=np.float)
 
 
 def _move_body(subject, others, space, dt, forward=None, rotate=0):
     accel = world.Vector.zero()
 
     if forward is not None:
-        accel += forward * _direction(subject.orientation)
+        accel += forward * util.direction(subject.orientation)
 
     # Massless objects experience no gravity
     if subject.mass != 0:
@@ -36,7 +27,7 @@ def _move_body(subject, others, space, dt, forward=None, rotate=0):
     if isinstance(subject, world.Ship):
         new_position = new_position % space.dimensions
 
-    new_orientation = (subject.orientation + dt * rotate) % (2 * math.pi)
+    new_orientation = (subject.orientation + dt * rotate) % (2 * np.pi)
 
     return dict(position=world.Vector.to_log(new_position),
                 velocity=world.Vector.to_log(new_velocity),
@@ -53,7 +44,7 @@ def _is_collision(subject, others):
 
 
 def _fire_pellet(ship, state):
-    direction = _direction(state['orientation'])
+    direction = util.direction(state['orientation'])
     # Use a small "fudge ratio" to spawn the pellet further away from the ship
     # (so we don't shoot ourselves).
     # Also ensure we use the "new state" of the ship at the end of this
@@ -113,7 +104,7 @@ def game(map_spec, controller_bots, step_duration):
 
     ship_to_bot = {}
     ships = []
-    for n, controller_bot in enumerate(controller_bots):
+    for controller_bot in controller_bots:
         ship_id = next(object_ids)
         controller = controller_bot.copy()
         ship_to_bot[ship_id] = controller.pop('bot')
@@ -122,7 +113,7 @@ def game(map_spec, controller_bots, step_duration):
             rotate=0.0,
             thrust=0.0,
         )
-        ships.append(dict(id=ship_id, data=map_spec.ship(n, controller)))
+        ships.append(dict(id=ship_id, data=map_spec.ship(controller)))
 
     planets = [dict(id=next(object_ids), data=planet)
                for planet in map_spec.planets]

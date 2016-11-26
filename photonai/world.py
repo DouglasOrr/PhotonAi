@@ -1,23 +1,9 @@
 '''Helpers which make it easier to work with the logs from
  photonai.schema'''
 
-import numpy as np
 from fastavro.writer import validate
 from . import schema
-
-
-class Vector:
-    def zero():
-        return np.zeros(2, dtype=np.float)
-
-    @staticmethod
-    def to_log(v):
-        assert v.shape == (2,), 'Expected a 2D numpy.array'
-        return dict(x=float(v[0]), y=float(v[1]))
-
-    @staticmethod
-    def create(d):
-        return np.array([d['x'], d['y']], dtype=np.float)
+from .util import Vector
 
 
 class Item:

@@ -1,22 +1,22 @@
 '''No planets - just ships.
 '''
 
-from . import common
 import numpy as np
+from . import common
+from .. import util
 
 
-space = common.space
+class Map(common.Map):
+    @property
+    def planets(self):
+        return []
 
-
-planets = []
-
-
-def ship(n, controller):
-    position = np.random.rand(2) * [space['dimensions']['x'],
-                                    space['dimensions']['y']]
-    orientation = 2 * np.pi * np.random.rand()
-    return common.ship(
-        controller=controller,
-        position=dict(x=position[0], y=position[1]),
-        velocity=dict(x=0, y=0),
-        orientation=orientation)
+    def ship(self, controller):
+        position = (np.random.rand(2) *
+                    util.Vector.create(self.space['dimensions']))
+        orientation = 2 * np.pi * np.random.rand()
+        return self._create_ship(
+            controller=controller,
+            position=position,
+            velocity=util.Vector.zero(),
+            orientation=orientation)

@@ -24,7 +24,9 @@ def _load_bot(path):
               show_default=True, help='name of a photonai.maps map to use')
 @click.option('-s', '--step-duration', type=click.FLOAT, default=0.1,
               show_default=True, help='simulation timestep')
-def run(bots, out, map, step_duration):
+@click.option('--seed', type=click.INT,
+              help='random seed to use for map generation')
+def run(bots, out, map, step_duration, seed):
     '''Run a single competitive game with some bots, and save the log.
     '''
     if os.path.exists(out):
@@ -32,7 +34,7 @@ def run(bots, out, map, step_duration):
             'Output file "%s" already exists - delete to proceed' % out)
 
     steps = game.game(
-        map_spec=getattr(maps, map),
+        map_spec=getattr(maps, map).Map(seed),
         controller_bots=[_load_bot(bot) for bot in bots],
         step_duration=step_duration)
 
