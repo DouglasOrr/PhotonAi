@@ -2,6 +2,7 @@ import click
 import os
 import sys
 import fastavro.writer
+import numpy as np
 from . import maps, schema, game, bot
 
 
@@ -28,16 +29,26 @@ def _load_bot(path):
               help='random seed to use for map generation')
 @click.option('-f', '--force', is_flag=True,
               help='replace the output file automatically')
-def run(bots, out, map, step_duration, seed, force):
+@click.option('--repeat-bots', default=1,
+              help='number of times to repeat the botlist')
+def run(bots, out, map, step_duration, seed, force, repeat_bots):
     '''Run a single competitive game with some bots, and save the log.
     '''
     if (not force) and os.path.exists(out):
         raise click.ClickException(
             'Output file "%s" already exists - delete to proceed' % out)
 
+    random = np.random.RandomState(seed)
+    seed = random.randint(2 ** 32)
+
+    bots = [_load_bot(bot)
+            for bot in bots
+            for _ in range(repeat_bots)]
+    random.shuffle(bots)
+
     steps = game.game(
         map_spec=getattr(maps, map).Map(seed),
-        controller_bots=[_load_bot(bot) for bot in bots],
+        controller_bots=bots,
         step_duration=step_duration)
 
     with open(out, 'wb') as f:
