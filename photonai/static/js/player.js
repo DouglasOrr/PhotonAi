@@ -20,7 +20,7 @@ function draw_planet(ctx, body) {
 function draw_ship(ctx, body, color) {
     // Constants
     var alpha = Math.PI / 4;
-    var bigger_by = 1.5;  // inflate the radius to 'match it up'
+    var bigger_by = 1.2;  // inflate the radius to 'match it up'
 
     // Compute vertices & draw
     var p = body.state.position;
@@ -28,12 +28,15 @@ function draw_ship(ctx, body, color) {
     var a1 = a0 + Math.PI - alpha;
     var a2 = a0 + Math.PI + alpha;
     var r = bigger_by * body.radius;
-    ctx.fillStyle = color;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 0.5;
+    ctx.lineCap = 'round';
     ctx.beginPath();
     ctx.moveTo(p.x + r * Math.sin(a0), p.y + r * Math.cos(a0));
     ctx.lineTo(p.x + r * Math.sin(a1), p.y + r * Math.cos(a1));
     ctx.lineTo(p.x + r * Math.sin(a2), p.y + r * Math.cos(a2));
-    ctx.fill();
+    ctx.lineTo(p.x + r * Math.sin(a0), p.y + r * Math.cos(a0));
+    ctx.stroke();
 }
 
 function draw_pellet(ctx, body, space_dimensions) {
