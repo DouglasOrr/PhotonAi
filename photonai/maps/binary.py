@@ -11,13 +11,12 @@ class Map(common.Map):
         super().__init__(seed)
         self._planet_radius = 12.0
         self._orbit = 60.0
-        self._center = util.Vector.create(self.space['dimensions']) / 2
         self._planet_mass = 2000
         self._n = 0
 
     @property
     def planets(self):
-        speed = np.sqrt(0.5 * self.space['gravity'] * self._planet_mass)
+        speed = np.sqrt(0.5) * self._orbit_speed(self._planet_mass)
         p_a = self._center + [-self._orbit / 2, 0]
         v_a = speed * util.Vector.up()
         p_b = self._center + [self._orbit / 2, 0]
