@@ -4,8 +4,25 @@ import numpy as np
 class Vector:
     '''Utilities for going between np.array and dict(x=, y=).
     '''
+    @staticmethod
     def zero():
         return np.zeros(2, dtype=np.float)
+
+    @staticmethod
+    def up():
+        return np.array([0, 1], dtype=np.float)
+
+    @staticmethod
+    def down():
+        return np.array([0, -1], dtype=np.float)
+
+    @staticmethod
+    def right():
+        return np.array([1, 0], dtype=np.float)
+
+    @staticmethod
+    def left():
+        return np.array([-1, 0], dtype=np.float)
 
     @staticmethod
     def to_log(v):

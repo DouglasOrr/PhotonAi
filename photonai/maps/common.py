@@ -58,5 +58,5 @@ class Map:
                     orientation=orientation)),
             weapon=self._create_weapon(),
             controller=controller,
-            max_thrust=10,
-            max_rotate=1)
+            max_thrust=20,
+            max_rotate=2)

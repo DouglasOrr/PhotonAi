@@ -7,6 +7,7 @@ from fastavro.writer import validate
 @parameterized([
     (maps.singleton,),
     (maps.empty,),
+    (maps.binary,),
 ])
 def test_validate(spec):
     m = spec.Map(100)

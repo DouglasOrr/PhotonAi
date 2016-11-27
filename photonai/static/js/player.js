@@ -139,7 +139,7 @@ function log_loaded(log) {
 	}
     }
 
-    callback_id = window.setInterval(step, 100);
+    callback_id = window.setInterval(step, 10);
 }
 
 $(function() {

@@ -22,14 +22,16 @@ def _load_bot(path):
 @click.argument('out', type=click.Path(writable=True))
 @click.option('-m', '--map', type=click.STRING, default='singleton',
               show_default=True, help='name of a photonai.maps map to use')
-@click.option('-s', '--step-duration', type=click.FLOAT, default=0.1,
+@click.option('-s', '--step-duration', type=click.FLOAT, default=0.01,
               show_default=True, help='simulation timestep')
 @click.option('--seed', type=click.INT,
               help='random seed to use for map generation')
-def run(bots, out, map, step_duration, seed):
+@click.option('-f', '--force', is_flag=True,
+              help='replace the output file automatically')
+def run(bots, out, map, step_duration, seed, force):
     '''Run a single competitive game with some bots, and save the log.
     '''
-    if os.path.exists(out):
+    if (not force) and os.path.exists(out):
         raise click.ClickException(
             'Output file "%s" already exists - delete to proceed' % out)
 
@@ -39,7 +41,7 @@ def run(bots, out, map, step_duration, seed):
         step_duration=step_duration)
 
     with open(out, 'wb') as f:
-        fastavro.writer.writer(f, schema.STEP, steps)
+        fastavro.writer.writer(f, schema.STEP, steps, codec='deflate')
 
 
 sys.argv[0] = 'photonai'
