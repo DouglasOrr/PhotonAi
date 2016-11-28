@@ -10,12 +10,9 @@ _project_path = os.path.abspath(os.path.join(__file__, '../..'))
 
 
 def _load_bot(path):
-    return dict(name=path,
-                version=0,
-                bot=bot.SubprocessBot(
-                    ['env', 'PYTHONPATH=%s' % _project_path,
-                     'python', path],
-                    stderr=sys.stderr))
+    return bot.SubprocessBot(
+        ['env', 'PYTHONPATH=%s' % _project_path, 'python', path],
+        stderr=sys.stderr)
 
 
 @click.command()
@@ -39,15 +36,14 @@ def run(bots, out, map, step_duration, seed, force, repeat_bots):
             'Output file "%s" already exists - delete to proceed' % out)
 
     random = np.random.RandomState(seed)
-    seed = random.randint(2 ** 32)
-
-    bots = [_load_bot(bot)
-            for bot in bots
+    map = getattr(maps, map).Map(random.randint(2 ** 32))
+    bots = [(dict(name=path, version=0), _load_bot(path))
+            for path in bots
             for _ in range(repeat_bots)]
     random.shuffle(bots)
 
-    steps = game.game(
-        map_spec=getattr(maps, map).Map(seed),
+    steps = game.run_game(
+        map_spec=map,
         controller_bots=bots,
         step_duration=step_duration)
 
