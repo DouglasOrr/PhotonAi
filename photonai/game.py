@@ -27,6 +27,12 @@ def _move_body(subject, others, space, dt, forward=None, rotate=0):
     if isinstance(subject, world.Ship):
         new_position = new_position % space.dimensions
 
+    # Pellets are auto-destroyed when out-of-bounds (for efficiency)
+    if isinstance(subject, world.Pellet) and \
+       np.any(new_position < util.Vector.zero()) and \
+       np.any(space.dimensions <= new_position):
+        return None
+
     new_orientation = (subject.orientation + dt * rotate) % (2 * np.pi)
 
     return dict(position=world.Vector.to_log(new_position),
@@ -167,10 +173,11 @@ def game(map_spec, controller_bots, step_duration):
                     controller=control)
 
             elif isinstance(obj, world.Pellet):
+                body_state = move_body(obj)
                 time_to_live = obj.time_to_live - step_duration
-                if 0 < time_to_live:
+                if 0 < time_to_live and body_state is not None:
                     state = dict(
-                        body=move_body(obj),
+                        body=body_state,
                         time_to_live=time_to_live)
                 else:
                     state = dict()  # destroys it
