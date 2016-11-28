@@ -12,9 +12,9 @@ class Map(common.Map):
         return []
 
     def ship(self, controller):
-        position = (np.random.rand(2) *
+        position = (self._random.rand(2) *
                     util.Vector.create(self.space['dimensions']))
-        orientation = 2 * np.pi * np.random.rand()
+        orientation = 2 * np.pi * self._random.rand()
         return self._create_ship(
             controller=controller,
             position=position,

@@ -36,7 +36,7 @@ class Map(common.Map):
             x = self.space['dimensions']['x'] - x
         self._n += 1
 
-        y = self.space['dimensions']['y'] * np.random.rand()
+        y = self.space['dimensions']['y'] * self._random.rand()
         return self._create_ship(
             controller=controller,
             position=np.array([x, y], dtype=np.float),
