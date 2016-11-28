@@ -81,11 +81,13 @@ class Body(Item):
 class Weapon(Item):
     __slots__ = Item.__slots__ + (
         'max_reload', 'max_temperature', 'temperature_decay',
-        'speed', 'time_to_live', 'reload', 'temperature')
+        'speed', 'time_to_live',
+        'fired', 'reload', 'temperature')
 
     @staticmethod
     def _read_state(state):
-        return dict(reload=float(state['reload']),
+        return dict(fired=bool(state['fired']),
+                    reload=float(state['reload']),
                     temperature=float(state['temperature']))
 
     @staticmethod

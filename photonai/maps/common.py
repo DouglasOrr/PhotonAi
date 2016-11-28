@@ -84,7 +84,7 @@ class Map:
             temperature_decay=0.25,
             speed=100,
             time_to_live=1,
-            state=dict(reload=0, temperature=0))
+            state=dict(fired=False, reload=0, temperature=0))
 
     def _create_ship(self, controller, position, velocity, orientation):
         return dict(

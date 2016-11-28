@@ -99,9 +99,7 @@ def _update_weapon(weapon, control_fire, dt):
 
     dt -- timestep
 
-    returns (weapon_state, fired)
-        weapon_state -- the new state of the weapon
-        fired -- true if the weapon was fired
+    returns -- Weapon.STATE new state of the weapon
     '''
     reload = max(0, weapon.reload - dt)
     # Calculate the decay ratio needed to get the time spent above
@@ -117,7 +115,7 @@ def _update_weapon(weapon, control_fire, dt):
         reload = weapon.max_reload
         temperature += 1
 
-    return dict(reload=reload, temperature=temperature), fired
+    return dict(fired=fired, reload=reload, temperature=temperature)
 
 
 def _fire_pellet(ship, body_state):
@@ -169,13 +167,10 @@ class Simulator:
 
             if isinstance(obj, world.Ship):
                 state['controller'] = control
-
-                # TODO: change weapon state to have a 'firing' flag
-                # - simplifies this code (& makes sense)
-                state['weapon'], fired = _update_weapon(obj.weapon,
-                                                        control['fire'],
-                                                        dt=self._step_duration)
-                if fired:
+                state['weapon'] = _update_weapon(obj.weapon,
+                                                 control['fire'],
+                                                 dt=self._step_duration)
+                if state['weapon']['fired']:
                     yield dict(id=next(self._object_id_gen),
                                data=_fire_pellet(obj, state['body']))
 

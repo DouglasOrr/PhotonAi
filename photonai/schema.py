@@ -56,6 +56,8 @@ class Weapon:
         name='State',
         namespace='photonai.weapon',
         fields=[
+            dict(name='fired', type='boolean',
+                 doc='True if the weapon was fired on this timestep.'),
             dict(name='reload', type='float',
                  doc='Time until reloaded'),
             dict(name='temperature', type='float',

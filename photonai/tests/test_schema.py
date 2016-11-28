@@ -27,7 +27,8 @@ class Body:
 
 
 class Weapon:
-    STATE = dict(reload=1.2,
+    STATE = dict(fired=True,
+                 reload=1.2,
                  temperature=18.3)
 
     CREATE = dict(max_reload=0.1,
