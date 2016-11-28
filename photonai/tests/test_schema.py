@@ -12,8 +12,7 @@ VECTOR = dict(x=100., y=-23.4)
 
 class Space:
     CREATE = dict(dimensions=VECTOR,
-                  gravity=0.12,
-                  lifetime=1000.0)
+                  gravity=0.12)
 
 
 class Body:

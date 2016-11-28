@@ -268,12 +268,72 @@ class Controllers:
                 self.control[id] = bot(dict(step=ship_step, ship_id=id))
 
 
-def run_game(map_spec, controller_bots, step_duration):
+class Stop(Exception):
+    '''Raised when the game should finish.
+    '''
+    def __init__(self, message, winner=None):
+        self.message = message
+        self.winner = winner
+
+    def __str__(self):
+        return 'game over: %s' % self.message
+
+
+def stop_after(limit_time):
+    '''Stop the game after a maximum time.
+    '''
+    def cond(world_):
+        if limit_time <= world_.time:
+            raise Stop('exceeded time limit %.2g' % limit_time)
+    return cond
+
+
+def stop_when_no_ships():
+    '''Stop the game when there are no ships remaining.
+    '''
+    def cond(world_):
+        if sum(1 for obj in world_.objects.values()
+               if isinstance(obj, world.Ship)) == 0:
+            raise Stop('no ships remaining')
+    return cond
+
+
+def stop_when_one_ship():
+    '''Regular last-man-standing stopper - when there is just one surviving
+    ship.
+    '''
+    def cond(world_):
+        ships = [obj for obj in world_.objects.values()
+                 if isinstance(obj, world.Ship)]
+        if len(ships) == 0:
+            raise Stop('no ships remaining (draw)')
+        elif len(ships) == 1:
+            ship = ships[0]
+            winner = dict(name=ship.controller.name,
+                          version=ship.controller.version)
+            raise Stop('won by %s:v%d' % (winner['name'], winner['version']),
+                       winner)
+    return cond
+
+
+def stop_when_any(*conditions):
+    '''Stop when any of the conditions are met.
+    '''
+    def cond(world_):
+        for f in conditions:
+            f(world_)
+    return cond
+
+
+def run_game(map_spec, controller_bots, stop, step_duration):
     '''Create an iterable of game updates.
 
     map_spec -- should have properties (space, planets, ship)
 
-    controller_bots -- a list of pairs (.schema.Controller.CREATE, .bot.Bot),
+    controller_bots -- a list of pairs (.schema.Controller.CREATE, .bot.Bot)
+
+    stop -- a function(world) which raises Stop when the simulation should
+    terminate
 
     step_duration -- period of time per step
 
@@ -312,5 +372,6 @@ def run_game(map_spec, controller_bots, step_duration):
     # Run the game
     yield step(map_spec.space)
     yield step(planets + ships)
-    while world_.time < world_.space.lifetime:
+    while True:
         yield step(simulator(controllers.control))
+        stop(world_)

@@ -23,7 +23,6 @@ class Space:
         fields=[
             dict(name='dimensions', type=VECTOR),
             dict(name='gravity', type='float'),
-            dict(name='lifetime', type='float'),
         ])
 
 

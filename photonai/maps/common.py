@@ -44,10 +44,8 @@ class Map:
     def space(self):
         '''Override to change the overall space layout.
         '''
-        return dict(
-            dimensions=dict(x=150, y=100),
-            gravity=0.1,
-            lifetime=60.0)
+        return dict(dimensions=dict(x=150, y=100),
+                    gravity=0.1)
 
     @property
     def planets(self):

@@ -51,13 +51,12 @@ class Item:
 
 
 class Space(Item):
-    __slots__ = Item.__slots__ + ('dimensions', 'gravity', 'lifetime')
+    __slots__ = Item.__slots__ + ('dimensions', 'gravity')
 
     @staticmethod
     def _read_create(create):
         return dict(dimensions=Vector.create(create['dimensions']),
-                    gravity=float(create['gravity']),
-                    lifetime=float(create['lifetime']))
+                    gravity=float(create['gravity']))
 
 
 class Body(Item):

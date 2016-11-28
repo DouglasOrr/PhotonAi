@@ -2,6 +2,7 @@ import click
 import os
 import sys
 import fastavro.writer
+import json
 import numpy as np
 from . import maps, schema, game, bot
 
@@ -13,6 +14,22 @@ def _load_bot(path):
     return bot.SubprocessBot(
         ['env', 'PYTHONPATH=%s' % _project_path, 'python', path],
         stderr=sys.stderr)
+
+
+def _stop_condition(nbots, time_limit):
+    '''Infer the appropriate stop condition from the number of starting bots,
+    whether running a pure simulation (0 bots), playground (1 bot), or battle
+    (2+ bots).
+    '''
+    if nbots == 0:
+        return game.stop_after(time_limit)
+    else:
+        return game.stop_when_any(
+            (game.stop_when_no_ships()
+             if nbots == 1 else
+             game.stop_when_one_ship()),
+            game.stop_after(time_limit)
+        )
 
 
 @click.command()
@@ -28,7 +45,9 @@ def _load_bot(path):
               help='replace the output file automatically')
 @click.option('--repeat-bots', default=1,
               help='number of times to repeat the botlist')
-def run(bots, out, map, step_duration, seed, force, repeat_bots):
+@click.option('--time-limit', default=60.0,
+              help='hard limit on the simulation time for a draw')
+def run(bots, out, map, step_duration, seed, force, repeat_bots, time_limit):
     '''Run a single competitive game with some bots, and save the log.
     '''
     if (not force) and os.path.exists(out):
@@ -45,10 +64,21 @@ def run(bots, out, map, step_duration, seed, force, repeat_bots):
     steps = game.run_game(
         map_spec=map,
         controller_bots=bots,
+        stop=_stop_condition(len(bots), time_limit),
         step_duration=step_duration)
 
     with open(out, 'wb') as f:
-        fastavro.writer.writer(f, schema.STEP, steps, codec='deflate')
+        try:
+            writer = fastavro.writer.Writer(f, schema.STEP, codec='deflate')
+            for step in steps:
+                writer.write(step)
+        except game.Stop as stop:
+            sys.stderr.write('%s\n' % stop)
+            print(json.dumps(None
+                             if stop.winner is None else
+                             stop.winner['name']))
+        finally:
+            writer.flush()
 
 
 sys.argv[0] = 'photonai'
