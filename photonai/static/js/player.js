@@ -7,7 +7,7 @@ function is_pellet(obj) {
 
 function draw_planet(ctx, body) {
     var p = body.state.position;
-    ctx.fillStyle = '#988';
+    ctx.fillStyle = '#68c';
     ctx.beginPath();
     ctx.arc(p.x, p.y, body.radius, 0, 2 * Math.PI);
     ctx.fill();
