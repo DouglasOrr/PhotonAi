@@ -25,6 +25,14 @@ class Vector:
         return np.array([-1, 0], dtype=np.float)
 
     @staticmethod
+    def unit(v):
+        return v / Vector.length(v)
+
+    @staticmethod
+    def length(v):
+        return np.sqrt((v ** 2).sum())
+
+    @staticmethod
     def to_log(v):
         assert v.shape == (2,), 'Expected a 2D numpy.array'
         return dict(x=float(v[0]), y=float(v[1]))

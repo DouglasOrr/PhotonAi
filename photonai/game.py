@@ -199,6 +199,50 @@ class Simulator:
                         id, controller_states.get(id))]
 
 
+def _is_obscured(world_, src, dest):
+    '''Only planets count as obscuring vision.
+    '''
+    los = dest.position - src.position
+    los_distance = util.Vector.length(los)
+    los_direction = los / los_distance
+
+    for obj in world_.objects.values():
+        if isinstance(obj, world.Planet):
+            relative = obj.position - src.position
+            d = np.dot(los_direction, relative)
+            if 0 < d and d < los_distance and (
+                    (relative ** 2).sum() < (d ** 2 + obj.radius ** 2)):
+                return True
+    return False
+
+
+def _obscured_ships(world_, from_ship):
+    '''Yield the object IDs of ships that are obscured from this one.
+    '''
+    for id, obj in world_.objects.items():
+        if isinstance(obj, world.Ship):
+            if obj is not from_ship and _is_obscured(world_, from_ship, obj):
+                yield id
+
+
+def _remove_ship_updates(step, ids):
+    '''Remove updates pertaining to a certain set of ship IDs.
+    '''
+    ids = set(ids)
+    if len(ids) == 0 and isinstance(step['data'], list):
+        return step
+    else:
+        step = step.copy()
+        # You can always see ship creation and destruction
+        # (done by testing 'max_thrust' & empty-update),
+        # otherwise exclude the obscured ships
+        step['data'] = [d for d in step['data']
+                        if d['id'] not in ids or
+                        'max_thrust' in d['data'] or
+                        len(d['data']) == 0]
+        return step
+
+
 class Controllers:
     DEFAULT_STATE = dict(
         fire=False,
@@ -218,7 +262,10 @@ class Controllers:
             if ship is None:
                 bot(dict(step=step, ship_id=None))
             else:
-                self.control[id] = bot(dict(step=step, ship_id=id))
+                # obscure vision of other ships
+                ship_step = _remove_ship_updates(
+                    step, _obscured_ships(self._world, ship))
+                self.control[id] = bot(dict(step=ship_step, ship_id=id))
 
 
 def run_game(map_spec, controller_bots, step_duration):
