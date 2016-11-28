@@ -28,12 +28,14 @@ class Map(common.Map):
     @property
     def planets(self):
         planet = self._create_planet(
+            name='centro',
             radius=self._planet_radius,
             mass=self._planet_mass,
             position=self._center,
             velocity=util.Vector.zero())
 
         moon = self._create_planet(
+            name='orbito',
             radius=self._moon_radius,
             mass=self._moon_mass,
             **self._orbit(self._moon_orientation))

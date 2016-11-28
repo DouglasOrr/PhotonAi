@@ -175,8 +175,8 @@ def game(map_spec, controller_bots, step_duration):
                 else:
                     state = dict()  # destroys it
 
-            elif isinstance(obj, world.Body):
-                state = move_body(obj)
+            elif isinstance(obj, world.Planet):
+                state = dict(body=move_body(obj))
 
             else:
                 raise ValueError('Unknown object type %s' % type(obj))

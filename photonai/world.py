@@ -114,6 +114,19 @@ class Controller(Item):
                     **Controller._read_state(create['state']))
 
 
+class Planet(Body):
+    __slots__ = Body.__slots__ + ('name',)
+
+    @staticmethod
+    def _read_state(state):
+        return Body._read_state(state['body'])
+
+    @staticmethod
+    def _read_create(create):
+        return dict(name=create['name'],
+                    **Body._read_create(create['body']))
+
+
 class Ship(Body):
     __slots__ = Body.__slots__ + (
         'weapon', 'controller', 'max_thrust', 'max_rotate')
@@ -164,17 +177,19 @@ class World:
         id_ = event['id']
         data = event['data']
 
-        if validate(data, schema.Body.CREATE):
-            assert id_ not in self.objects
-            self.objects[id_] = Body.create(clock, data)
-        elif validate(data, schema.Ship.CREATE):
+        # Validate in order richest-to-emptiest events (safest due to the
+        # Avro libraries' duck-typing)
+        if validate(data, schema.Ship.CREATE):
             assert id_ not in self.objects
             self.objects[id_] = Ship.create(clock, data)
         elif validate(data, schema.Pellet.CREATE):
             assert id_ not in self.objects
             self.objects[id_] = Pellet.create(clock, data)
+        elif validate(data, schema.Planet.CREATE):
+            assert id_ not in self.objects
+            self.objects[id_] = Planet.create(clock, data)
 
-        elif validate(data, [schema.Body.STATE,
+        elif validate(data, [schema.Planet.STATE,
                              schema.Ship.STATE,
                              schema.Pellet.STATE]):
             self.objects[id_].update(clock, data)

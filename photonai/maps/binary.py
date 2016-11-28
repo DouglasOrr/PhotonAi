@@ -21,11 +21,11 @@ class Map(common.Map):
         v_a = speed * util.Vector.up()
         p_b = self._center + [self._orbit / 2, 0]
         v_b = speed * util.Vector.down()
-        return [self._create_planet(
-            radius=self._planet_radius,
-            mass=self._planet_mass,
-            position=p, velocity=v)
-                for p, v in [(p_a, v_a), (p_b, v_b)]]
+        return [self._create_planet(radius=self._planet_radius,
+                                    mass=self._planet_mass,
+                                    **args)
+                for args in [dict(name='alphum', position=p_a, velocity=v_a),
+                             dict(name='betum', position=p_b, velocity=v_b)]]
 
     def ship(self, controller):
         # Compute a random 'x' value at alternating sides

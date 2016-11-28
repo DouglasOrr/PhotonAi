@@ -17,7 +17,7 @@ def test_validate(spec):
     assert validate(m.space, schema.Space.CREATE)
 
     for planet in m.planets:
-        assert validate(planet, schema.Body.CREATE)
+        assert validate(planet, schema.Planet.CREATE)
 
     for n in [0, 10]:
         assert validate(m.ship(test_schema.Controller.CREATE),

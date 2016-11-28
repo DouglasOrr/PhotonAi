@@ -15,6 +15,7 @@ class Map(common.Map):
     @property
     def planets(self):
         return [self._create_planet(
+            name='centro',
             radius=self._planet_radius,
             mass=1000,
             position=self._center,

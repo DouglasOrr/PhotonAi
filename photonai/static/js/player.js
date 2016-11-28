@@ -1,12 +1,8 @@
-
 function is_ship(obj) {
     return 'controller' in obj;
 }
 function is_pellet(obj) {
     return 'time_to_live' in obj;
-}
-function is_planet(obj) {
-    return 'radius' in obj;  // Just a body
 }
 
 function draw_planet(ctx, body) {
@@ -82,7 +78,7 @@ function draw(space_dimensions, objects, ship_colors) {
 	} else if (is_pellet(obj)) {
 	    draw_pellet(ctx, obj.body, space_dimensions);
 	} else {
-	    draw_planet(ctx, obj);
+	    draw_planet(ctx, obj.body);
 	}
     });
 }
@@ -114,18 +110,19 @@ function log_loaded(log) {
 		var obj = objects[e.id];
 		if (Object.keys(e.data).length == 0) {
 		    delete objects[e.id];
-		} else if (is_ship(obj)) {
-		    obj.body.state = e.data.body;
-		    obj.weapon.state = e.data.weapon;
-		    obj.controller.state = e.data.controller;
-		} else if (is_pellet(obj)) {
-		    obj.body.state = e.data.body;
-		    obj.time_to_live = e.data.time_to_live;
 		} else {
-		    obj.state = e.data;
+		    obj.body.state = e.data.body;
+		    if (is_ship(obj)) {
+			obj.weapon.state = e.data.weapon;
+			obj.controller.state = e.data.controller;
+		    } else if (is_pellet(obj)) {
+			obj.time_to_live = e.data.time_to_live;
+		    } else {
+			// Planet has no other updatable state
+		    }
 		}
 	    } else {
-		// Should be {body, ship, pellet}.Create
+		// Should be {Planet, Ship, Pellet}.Create
                 objects[e.id] = e.data;
 		if (is_ship(e.data) && !(e.id in ship_colors)) {
 		    ship_colors[e.id] = gen_ship_color();

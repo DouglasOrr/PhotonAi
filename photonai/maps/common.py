@@ -67,14 +67,15 @@ class Map:
     def _center(self):
         return Vector.create(self.space['dimensions']) / 2
 
-    def _create_planet(self, radius, mass, position, velocity):
-        return dict(
-            radius=radius,
-            mass=mass,
-            state=dict(
-                position=Vector.to_log(position),
-                velocity=Vector.to_log(velocity),
-                orientation=0))
+    def _create_planet(self, name, radius, mass, position, velocity):
+        return dict(name=name,
+                    body=dict(
+                        radius=radius,
+                        mass=mass,
+                        state=dict(
+                            position=Vector.to_log(position),
+                            velocity=Vector.to_log(velocity),
+                            orientation=0)))
 
     def _create_weapon(self):
         return dict(

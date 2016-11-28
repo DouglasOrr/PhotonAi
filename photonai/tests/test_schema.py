@@ -48,6 +48,13 @@ class Controller:
                   state=STATE)
 
 
+class Planet:
+    STATE = dict(body=Body.STATE)
+
+    CREATE = dict(name='hivitar',
+                  body=Body.CREATE)
+
+
 class Ship:
     STATE = dict(body=Body.STATE,
                  weapon=Weapon.STATE,
@@ -73,9 +80,9 @@ class Object:
 
     EVENTS = [dict(id=2468,
                    data=data)
-              for data in [Body.CREATE, Body.STATE,
-                           Ship.CREATE, Ship.STATE,
+              for data in [Ship.CREATE, Ship.STATE,
                            Pellet.CREATE, Pellet.STATE,
+                           Planet.CREATE, Planet.STATE,
                            DESTROY]]
 
 
@@ -111,6 +118,8 @@ STEPS = [dict(clock=300,
     (schema.Weapon.CREATE, Weapon.CREATE),
     (schema.Controller.STATE, Controller.STATE),
     (schema.Controller.CREATE, Controller.CREATE),
+    (schema.Planet.STATE, Planet.STATE),
+    (schema.Planet.CREATE, Planet.CREATE),
     (schema.Ship.STATE, Ship.STATE),
     (schema.Ship.CREATE, Ship.CREATE),
     (schema.Pellet.STATE, Pellet.STATE),

@@ -27,7 +27,7 @@ class Space:
         ])
 
 
-# In-game objects
+# Sub-objects
 
 class Body:
     STATE = dict(
@@ -107,6 +107,26 @@ class Controller:
         ])
 
 
+# Top-level objects
+
+class Planet:
+    STATE = dict(
+        type='record',
+        name='State',
+        namespace='photonai.planet',
+        fields=[
+            dict(name='body', type=Body.STATE),
+        ])
+    CREATE = dict(
+        type='record',
+        name='Create',
+        namespace='photonai.planet',
+        fields=[
+            dict(name='body', type=Body.CREATE),
+            dict(name='name', type='string'),
+        ])
+
+
 class Ship:
     STATE = dict(
         type='record',
@@ -163,9 +183,11 @@ class Object:
         fields=[
             dict(name='id', type='int'),
             dict(name='data', type=[
-                Body.CREATE, Body.STATE,
+                # due to slightly broken duck-subtyping, it is safest
+                # to put richest events first
                 Ship.CREATE, Ship.STATE,
                 Pellet.CREATE, Pellet.STATE,
+                Planet.CREATE, Planet.STATE,
                 DESTROY,
             ]),
         ])
