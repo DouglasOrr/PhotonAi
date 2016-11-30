@@ -9,7 +9,6 @@ setuptools.setup(
         'click',
         'fastavro',
         'flask',
-        'flask-assets',
         'numpy',
     ],
 )

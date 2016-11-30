@@ -1,4 +1,7 @@
 __pycache__
+.git/
+local/
+node_modules/
 photonai/static/gen/
 photonai/static/.webassets-cache/
 photonai/static/.tmp/

@@ -1,6 +1,7 @@
 __pycache__
-gen/
-.webassets-cache/
 .tmp/
+.webassets-cache/
+gen/
 lib/
 local/
+node_modules/

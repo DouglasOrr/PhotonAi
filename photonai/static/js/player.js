@@ -142,10 +142,56 @@ function log_loaded(log) {
     callback_id = window.setInterval(step, 10);
 }
 
-$(function() {
-    var id = 'sample';  // TODO
+// $(function() {
+//     var id = 'sample';  // TODO
+//     $.get({url: '/replay/' + id,
+//            cache: false
+//           }).then(log_loaded);
+// });
 
-    $.get({url: '/replay/' + id,
-           cache: false
-          }).then(log_loaded);
+function read_jsonl(file, on_load) {
+    var reader = new FileReader();
+    reader.onload = function (e) {
+	var log = [];
+	var lines = e.target.result.split('\n');
+	lines.forEach(function(line) {
+	    if (line !== '') {
+		log.push(JSON.parse(line));
+	    }
+	});
+	on_load(log);
+    };
+    reader.readAsText(file);
+}
+
+function read_avro(file, on_load) {
+    // TODO: this is broken
+    console.log(file);
+    avsc.createBlobDecoder(file, {'wrapUnions': true});
+}
+
+function read_file(e) {
+    // User is loading a new file - we should hide any old errors
+    $('.alert').hide();
+
+    var file = e.target.files[0];
+    if (file.name.endsWith(".jsonl") ||
+	file.name.endsWith(".json")) {
+	read_jsonl(file, log_loaded);
+
+    } else {
+	$('.alert-text').html(
+	    '<strong>Failed to load ' + file.name + '</strong>' +
+	    ' - extension not recognized (expected {.jsonl .json})');
+	$('.alert').show();
+    }
+    // Reset the state - otherwise it doesn't do what you'd expect if you
+    // reload the same file
+    e.target.value = '';
+}
+
+$(function() {
+    $('.alert').hide();
+    $('.alert .close').on('click', function (e) { $(e.target).parent().hide(); });
+    $('.replay-file').on('change', read_file);
 });

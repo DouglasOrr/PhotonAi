@@ -1,0 +1,15 @@
+#!/bin/bash
+
+LIB="photonai/static/lib"
+
+set -e
+
+mkdir -p ${LIB}
+
+npm install
+
+browserify scripts/lib.js -o "${LIB}/all.js"
+
+cat node_modules/bootstrap/dist/css/bootstrap.min.css \
+    node_modules/bootstrap/dist/css/bootstrap-theme.min.css \
+    > "${LIB}/all.css"

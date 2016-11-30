@@ -3,7 +3,6 @@ fastavro
 flake8
 flake8-quotes
 flask
-flask-assets
 nose
 nose-parameterized
 numpy

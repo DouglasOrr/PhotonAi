@@ -1,0 +1,12 @@
+{
+  "name": "photonai.web",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DouglasOrr/PhotonAi.git"
+  },
+  "dependencies": {
+    "avsc": "^4.1.10",
+    "bootstrap": "^3.3.7",
+    "jquery": "^3.1.1"
+  }
+}
