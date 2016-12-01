@@ -1,13 +1,18 @@
-h1 {
-    text-align: center;
+/* Title bar */
+.filename {
+    display: inline-block;
+    margin-top: 1em;
+    margin-bottom: 0;
 }
-.load-file {
+.replay-file-holder {
+    display: inline-block;
     float: right;
 }
 .player-canvas {
     background: #000;
     display: block;
 }
+/* Controls */
 .player-controls-holder {
     position: relative;
 }
@@ -16,20 +21,22 @@ h1 {
 }
 .player-buttons-holder .btn {
     width: 3em;
+    padding: 0;
+}
+/* Seek */
+.range-field .thumb {
+    visibility: hidden;
 }
 .player-seek-holder {
-    position: absolute;
+    position: absolute !important;
     left: 0;
     bottom: 0;
     top: 0;
     width: 100%;
-    padding-top: 0.4em;
     padding-left: 9.5em;
     overflow: hidden;
 }
-input[type=file] {
-    display: none;
-}
+/* Alerts */
 .alert {
     margin-bottom: 0px;
     position: fixed;

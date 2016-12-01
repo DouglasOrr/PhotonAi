@@ -5,42 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/static/lib/all.css">
     <link rel="stylesheet" href="/static/css/player.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <script type="text/javascript" src="/static/lib/all.js"></script>
     <script type="text/javascript" src="/static/js/player.js"></script>
   </head>
   <body>
     <div class="container fill">
       <div class="row">
-	<h1><span class="filename"></span>
-	  <label class="btn btn-default load-file">
-	    Replay File <input type="file" class="replay-file">
-	  </label>
-	</h1>
+	<span class="lead filename"></span>
+	<div class="file-field input-field replay-file-holder">
+	  <div class="btn">
+	    <span>Replay File</span>
+	    <input type="file" class="replay-file">
+	  </div>
+	</div>
       </div>
       <div class="row player-canvas-holder">
         <canvas class="player-canvas">
         </canvas>
       </div>
       <div class="row player-controls-holder">
-	<div class="player-seek-holder">
+	<div class="player-seek-holder range-field">
 	  <input type="range" class="player-seek" value="0">
 	</div>
 	<!-- Must be after the seek, as we're using padding (otherwise would overlay) -->
 	<div class="btn-group player-buttons-holder">
-	  <button class="btn btn-default player-start">
-	    <span class="glyphicon glyphicon-fast-backward" aria-hidden="true"></span>
+	  <button class="btn player-start">
+	    <i class="material-icons">skip_previous</i>
 	  </button>
-	  <button class="btn btn-primary player-play">
-	    <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+	  <button class="btn player-play">
+	    <i class="material-icons">play_arrow</i>
 	  </button>
-	  <button class="btn btn-primary player-restart">
-	    <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>
+	  <button class="btn player-restart">
+	    <i class="material-icons">replay</i>
 	  </button>
-	  <button class="btn btn-info player-pause">
-	    <span class="glyphicon glyphicon-pause" aria-hidden="true"></span>
+	  <button class="btn player-pause">
+	    <i class="material-icons">pause</i>
 	  </button>
-	  <button class="btn btn-default player-end">
-	    <span class="glyphicon glyphicon-fast-forward" aria-hidden="true"></span>
+	  <button class="btn player-end">
+	    <i class="material-icons">skip_next</i>
 	  </button>
 	</div>
       </div>

@@ -1,21 +1,20 @@
 #!/bin/bash
 
 LIB="photonai/static/lib"
-FONTS="photonai/static/fonts"
 BOOTSTRAP="node_modules/bootstrap/dist"
+MATERIALIZE="node_modules/materialize-css/dist"
 
 set -e
 
-mkdir -p "${LIB}" "${FONTS}"
+mkdir -p "${LIB}"
 
 npm install
+
+# Hack https://github.com/Dogfalo/materialize/issues/3139
+cp node_modules/materialize-css/js/date_picker/picker.js node_modules/materialize-css/bin
 
 browserify scripts/lib.js -o "${LIB}/all.js"
 
 cat "${BOOTSTRAP}/css/bootstrap.min.css" \
-    "${BOOTSTRAP}/css/bootstrap-theme.min.css" \
+    "${MATERIALIZE}/css/materialize.min.css" \
     > "${LIB}/all.css"
-
-cp "${BOOTSTRAP}/fonts/glyphicons-halflings-regular.woff2" \
-   "${BOOTSTRAP}/fonts/glyphicons-halflings-regular.woff" \
-   "${FONTS}"
