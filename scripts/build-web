@@ -1,15 +1,21 @@
 #!/bin/bash
 
 LIB="photonai/static/lib"
+FONTS="photonai/static/fonts"
+BOOTSTRAP="node_modules/bootstrap/dist"
 
 set -e
 
-mkdir -p ${LIB}
+mkdir -p "${LIB}" "${FONTS}"
 
 npm install
 
 browserify scripts/lib.js -o "${LIB}/all.js"
 
-cat node_modules/bootstrap/dist/css/bootstrap.min.css \
-    node_modules/bootstrap/dist/css/bootstrap-theme.min.css \
+cat "${BOOTSTRAP}/css/bootstrap.min.css" \
+    "${BOOTSTRAP}/css/bootstrap-theme.min.css" \
     > "${LIB}/all.css"
+
+cp "${BOOTSTRAP}/fonts/glyphicons-halflings-regular.woff2" \
+   "${BOOTSTRAP}/fonts/glyphicons-halflings-regular.woff" \
+   "${FONTS}"

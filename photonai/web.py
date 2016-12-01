@@ -9,8 +9,8 @@ replay_folder = os.path.abspath(
     os.path.join(__file__, '../static/.tmp/replays'))
 
 
-@app.route('/')
-def index():
+@app.route('/player')
+def player():
     return render_template('player.html')
 
 

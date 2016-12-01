@@ -3,5 +3,7 @@ __pycache__
 local/
 node_modules/
 photonai/static/gen/
+photonai/static/lib/
+photonai/static/fonts/
 photonai/static/.webassets-cache/
 photonai/static/.tmp/

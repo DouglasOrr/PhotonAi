@@ -1,3 +1,10 @@
+var settings = {
+    canvas_aspect: 2./3,
+    tick_time: 10 // ms
+};
+
+// -------------------- Rendering --------------------
+
 function is_ship(obj) {
     return 'controller' in obj;
 }
@@ -69,6 +76,9 @@ function draw(space_dimensions, objects, ship_colors) {
     ctx.clip();
     ctx.fillStyle = '#000';
     ctx.fill();
+    ctx.lineWidth = 2 / scale;
+    ctx.strokeStyle = '#a44';
+    ctx.stroke();
 
     // Draw all the objects
     Object.keys(objects).forEach(function(id) {
@@ -83,7 +93,7 @@ function draw(space_dimensions, objects, ship_colors) {
     });
 }
 
-/* Generates color codes to assign to ships. */
+// Generates color codes to assign to ships.
 function ship_palette() {
     var colors = ['#f00', '#0f0', '#22f'];
     var index = -1;
@@ -93,61 +103,116 @@ function ship_palette() {
     };
 }
 
-function log_loaded(log) {
-    // State
-    var space_dimensions = log[0].data.dimensions;
-    var objects = {};
-    var ship_colors = {};
-    var gen_ship_color = ship_palette();
-    var event = 1;
-    var callback_id;
+var state = {
+    playing: false,
+    n: 0,
+    space_dimensions: null,
+    states: null,
+    ship_colors: null
+}
 
-    function step() {
-	// Update the game objects
-	var step_data = log[event].data;
-	step_data.forEach(function (e) {
+function redraw() {
+    // Draw the current state
+    draw(state.space_dimensions,
+	 state.states[state.n],
+	 state.ship_colors);
+}
+
+function refresh_playing() {
+    if (state.playing) {
+	$('.player-play').hide();
+	$('.player-restart').hide();
+	$('.player-pause').show();
+
+    } else {
+	$('.player-pause').hide();
+	if (state.states !== null &&
+	    state.n == state.states.length - 1) {
+	    $('.player-play').hide();
+	    $('.player-restart').show();
+	} else {
+	    $('.player-restart').hide();
+	    $('.player-play').show();
+	}
+    }
+}
+
+function set_playing(playing) {
+    state.playing = playing && state.states !== null;
+    refresh_playing();
+}
+
+function tick() {
+    if (state.playing) {
+	$('.player-seek').val(state.n);
+	redraw();
+	if (state.n < state.states.length - 1) {
+	    state.n += 1;
+	} else {
+	    set_playing(false);
+	}
+    }
+}
+
+function seek(n) {
+    if (state.states !== null) {
+	if (n < 0) {
+	    n = state.states.length + n;
+	}
+	$('.player-seek').val(n);
+	state.n = n;
+	refresh_playing();
+	redraw();
+    }
+}
+
+function setup_log(log) {
+    state.space_dimensions = log[0].data.dimensions;
+    state.n = 0;
+    state.states = [];
+    state.ship_colors = {};
+
+    var gen_ship_color = ship_palette();
+    var objects = {};
+    log.slice(1).forEach(function (step) {
+	// Copy in case we modify
+	objects = $.extend({}, objects);
+	step.data.forEach(function (e) {
 	    if (e.id in objects) {
-		var obj = objects[e.id];
 		if (Object.keys(e.data).length == 0) {
 		    delete objects[e.id];
 		} else {
+		    var obj = $.extend({}, objects[e.id]);
+		    obj.body = $.extend({}, obj.body);
 		    obj.body.state = e.data.body;
 		    if (is_ship(obj)) {
+			obj.weapon = $.extend({}, obj.weapon);
 			obj.weapon.state = e.data.weapon;
+			obj.controller = $.extend({}, obj.controller);
 			obj.controller.state = e.data.controller;
 		    } else if (is_pellet(obj)) {
 			obj.time_to_live = e.data.time_to_live;
 		    } else {
 			// Planet has no other updatable state
 		    }
+		    objects[e.id] = obj;
 		}
 	    } else {
 		// Should be {Planet, Ship, Pellet}.Create
                 objects[e.id] = e.data;
-		if (is_ship(e.data) && !(e.id in ship_colors)) {
-		    ship_colors[e.id] = gen_ship_color();
+		if (is_ship(e.data) && !(e.id in state.ship_colors)) {
+		    state.ship_colors[e.id] = gen_ship_color();
 		}
 	    }
 	});
-	// Draw the current state
-	draw(space_dimensions, objects, ship_colors);
+	state.states.push(objects);
+    });
 
-	// Advance
-	event = event + 1;
-	if (log.length <= event) {
-	    window.clearInterval(callback_id);
-	}
-    }
-
-    callback_id = window.setInterval(step, 10);
+    $('.player-seek').attr('max', state.states.length - 1);
+    set_playing(true);
 }
 
-// $(function() {
-//     var id = 'sample';  // TODO
-//     $.get({url: '/replay/' + id,
-//            cache: false
-//           }).then(log_loaded);
-// });
+// -------------------- UI/loading --------------------
 
 function read_jsonl(file, on_load) {
     var reader = new FileReader();
@@ -166,18 +231,23 @@ function read_jsonl(file, on_load) {
 
 function read_avro(file, on_load) {
     // TODO: this is broken
-    console.log(file);
     avsc.createBlobDecoder(file, {'wrapUnions': true});
+}
+
+function set_filename(name) {
+    $('.filename').text(name || 'No replay loaded...');
 }
 
 function read_file(e) {
     // User is loading a new file - we should hide any old errors
     $('.alert').hide();
+    set_filename();
 
     var file = e.target.files[0];
     if (file.name.endsWith(".jsonl") ||
 	file.name.endsWith(".json")) {
-	read_jsonl(file, log_loaded);
+	read_jsonl(file, setup_log);
+	set_filename(file.name);
 
     } else {
 	$('.alert-text').html(
@@ -190,8 +260,54 @@ function read_file(e) {
     e.target.value = '';
 }
 
+function resize_canvas() {
+    var width = $('.player-canvas-holder').width();
+    $('.player-canvas')
+	.attr('width', width)
+	.attr('height', settings.canvas_aspect * width);
+}
+
 $(function() {
+    set_playing(false);
+    $('.player-start').on('click', function (e) {
+	set_playing(false);
+	seek(0);
+    });
+    $('.player-play').on('click', function (e) {
+	set_playing(true);
+    });
+    $('.player-pause').on('click', function (e) {
+	set_playing(false);
+    });
+    $('.player-restart').on('click', function (e) {
+	seek(0);
+	set_playing(true);
+    });
+    $('.player-end').on('click', function (e) {
+	set_playing(false);
+	seek(-1);
+    });
+    $('.player-seek').on('input', function (e) {
+	seek(parseInt($(e.target).val()));
+    });
+
     $('.alert').hide();
-    $('.alert .close').on('click', function (e) { $(e.target).parent().hide(); });
+    $('.alert .close').on('click', function (e) {
+	$(e.target).parent().hide();
+    });
+
+    set_filename();
     $('.replay-file').on('change', read_file);
+
+    resize_canvas();
+    $(window).resize(resize_canvas);
+
+    window.setInterval(tick, settings.tick_time);
 });
+
+// $(function() {
+//     var id = 'sample';  // TODO
+//     $.get({url: '/replay/' + id,
+//            cache: false
+//           }).then(log_loaded);
+// });

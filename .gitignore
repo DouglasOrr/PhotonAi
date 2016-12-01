@@ -3,5 +3,6 @@ __pycache__
 .webassets-cache/
 gen/
 lib/
+fonts/
 local/
 node_modules/

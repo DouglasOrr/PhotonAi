@@ -1,3 +1,32 @@
+h1 {
+    text-align: center;
+}
+.load-file {
+    float: right;
+}
+.player-canvas {
+    background: #000;
+    display: block;
+}
+.player-controls-holder {
+    position: relative;
+}
+.player-buttons-holder {
+    width: 9em;
+}
+.player-buttons-holder .btn {
+    width: 3em;
+}
+.player-seek-holder {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    top: 0;
+    width: 100%;
+    padding-top: 0.4em;
+    padding-left: 9.5em;
+    overflow: hidden;
+}
 input[type=file] {
     display: none;
 }

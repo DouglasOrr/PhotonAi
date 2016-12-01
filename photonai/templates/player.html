@@ -9,15 +9,40 @@
     <script type="text/javascript" src="/static/js/player.js"></script>
   </head>
   <body>
-    <div class="container-fluid">
+    <div class="container fill">
       <div class="row">
-	<label class="btn btn-default btn-file">
-	  Replay File <input type="file" class="replay-file">
-	</label>
+	<h1><span class="filename"></span>
+	  <label class="btn btn-default load-file">
+	    Replay File <input type="file" class="replay-file">
+	  </label>
+	</h1>
       </div>
-      <div class="row">
-        <canvas class="player-canvas" width="1000", height="500">
+      <div class="row player-canvas-holder">
+        <canvas class="player-canvas">
         </canvas>
+      </div>
+      <div class="row player-controls-holder">
+	<div class="player-seek-holder">
+	  <input type="range" class="player-seek" value="0">
+	</div>
+	<!-- Must be after the seek, as we're using padding (otherwise would overlay) -->
+	<div class="btn-group player-buttons-holder">
+	  <button class="btn btn-default player-start">
+	    <span class="glyphicon glyphicon-fast-backward" aria-hidden="true"></span>
+	  </button>
+	  <button class="btn btn-primary player-play">
+	    <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+	  </button>
+	  <button class="btn btn-primary player-restart">
+	    <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>
+	  </button>
+	  <button class="btn btn-info player-pause">
+	    <span class="glyphicon glyphicon-pause" aria-hidden="true"></span>
+	  </button>
+	  <button class="btn btn-default player-end">
+	    <span class="glyphicon glyphicon-fast-forward" aria-hidden="true"></span>
+	  </button>
+	</div>
       </div>
       <div class="alert alert-danger alert-dismissable fade in">
         <a href="#" class="close">&times;</a>
