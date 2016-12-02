@@ -1,17 +1,36 @@
-import flask
 import os
 import fastavro
-from flask import Flask, render_template
+import flask
 
-app = Flask(__name__)
+app = flask.Flask(__name__)
 
 replay_folder = os.path.abspath(
     os.path.join(__file__, '../static/.tmp/replays'))
 
 
+@app.route('/')
+def index():
+    return flask.redirect('/leaderboard')
+
+
+@app.route('/leaderboard')
+def leaderboard():
+    return 'TODO'
+
+
+@app.route('/history')
+def history():
+    return 'TODO'
+
+
+@app.route('/uploader')
+def uploader():
+    return 'TODO'
+
+
 @app.route('/player')
 def player():
-    return render_template('player.html')
+    return flask.render_template('player.html')
 
 
 @app.route('/replay/<name>')

@@ -1,29 +1,36 @@
-/* Title bar */
-.filename {
+/* Nav Bar */
+.brand-logo {
+    margin-left: 10px;
+}
+/* Title Bar */
+.player-title {
     display: inline-block;
     margin-top: 1em;
     margin-bottom: 0;
+    font-weight: 100;
+    font-size: x-large;
 }
 .replay-file-holder {
     display: inline-block;
     float: right;
 }
+/* Player */
 .player-canvas {
     background: #000;
     display: block;
 }
-/* Controls */
+/* Player Controls */
 .player-controls-holder {
     position: relative;
 }
 .player-buttons-holder {
-    width: 9em;
+    width: 10em;
 }
 .player-buttons-holder .btn {
     width: 3em;
     padding: 0;
 }
-/* Seek */
+/* Player Seek */
 .range-field .thumb {
     visibility: hidden;
 }
@@ -33,8 +40,12 @@
     bottom: 0;
     top: 0;
     width: 100%;
-    padding-left: 9.5em;
+    padding-left: 10.5em;
     overflow: hidden;
+    pointer-events: none;
+}
+.player-seek-holder input {
+    pointer-events: auto;
 }
 /* Alerts */
 .alert {

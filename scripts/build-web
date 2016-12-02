@@ -1,8 +1,7 @@
 #!/bin/bash
 
 LIB="photonai/static/lib"
-BOOTSTRAP="node_modules/bootstrap/dist"
-MATERIALIZE="node_modules/materialize-css/dist"
+MATERIALIZE="node_modules/materialize-css"
 
 set -e
 
@@ -11,10 +10,9 @@ mkdir -p "${LIB}"
 npm install
 
 # Hack https://github.com/Dogfalo/materialize/issues/3139
-cp node_modules/materialize-css/js/date_picker/picker.js node_modules/materialize-css/bin
+cp "${MATERIALIZE}/js/date_picker/picker.js" "${MATERIALIZE}/bin"
 
 browserify scripts/lib.js -o "${LIB}/all.js"
 
-cat "${BOOTSTRAP}/css/bootstrap.min.css" \
-    "${MATERIALIZE}/css/materialize.min.css" \
+cat "${MATERIALIZE}/dist/css/materialize.min.css" \
     > "${LIB}/all.css"

@@ -235,7 +235,7 @@ function read_avro(file, on_load) {
 }
 
 function set_filename(name) {
-    $('.filename').text(name || 'No replay loaded...');
+    $('.player-title').text(name || 'No replay loaded...');
 }
 
 function read_file(e) {

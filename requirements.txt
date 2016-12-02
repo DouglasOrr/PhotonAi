@@ -6,3 +6,4 @@ flask
 nose
 nose-parameterized
 numpy
+pymssql
