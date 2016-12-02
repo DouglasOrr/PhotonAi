@@ -1,0 +1,26 @@
+-- create some databases
+
+-- TDSVER=7.0 tsql -S photonai.database.windows.net -D photonai -U douglas@photonai -P PASSWORD < scripts/create_tables
+-- conn = pymssql.connect("photonai.database.windows.net", user="douglas@photonai", password=PASSWORD, database="photonai", tds_version="7.0")
+
+CREATE TABLE bots
+(
+       id INT IDENTITY(1,1) PRIMARY KEY,
+       name NTEXT NOT NULL,
+       upload_version INT NOT NULL,
+       uploaded DATETIME NOT NULL,
+       script NTEXT NOT NULL,
+)
+
+CREATE TABLE games
+(
+       id INT IDENTITY(1,1) PRIMARY KEY,
+       bot_a INT NOT NULL,
+       bot_b INT NOT NULL,
+       winner INT,
+       played DATETIME NOT NULL,
+       map NTEXT NOT NULL,
+       seed INT NOT NULL
+)
+
+GO
