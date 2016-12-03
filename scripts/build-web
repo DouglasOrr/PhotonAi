@@ -1,11 +1,12 @@
 #!/bin/bash
 
 LIB="photonai/static/lib"
+FONTS="photonai/static/fonts"
 MATERIALIZE="node_modules/materialize-css"
 
 set -e
 
-mkdir -p "${LIB}"
+mkdir -p "${LIB}" "${FONTS}"
 
 npm install
 
@@ -16,3 +17,5 @@ browserify scripts/lib.js -o "${LIB}/all.js"
 
 cat "${MATERIALIZE}/dist/css/materialize.min.css" \
     > "${LIB}/all.css"
+
+cp -r "${MATERIALIZE}/dist/fonts/roboto/" "${FONTS}/roboto"
