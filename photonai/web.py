@@ -25,7 +25,7 @@ def history():
 
 @app.route('/uploader')
 def uploader():
-    return 'TODO'
+    return flask.render_template('uploader.html')
 
 
 @app.route('/player')

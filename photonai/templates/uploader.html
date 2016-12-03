@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block body %}
+<h1>Upload AI</h1>
+<div class="row">
+  <form action="upload">
+    <div class="input-field">
+      <input type="text" name="first_name" placeholder="First Name" class="validate">
+      <label for="first_name">First Name</label>
+    </div>
+    <div class="input-field">
+      <input type="text" name="last_name" placeholder="Last Name" class="validate">
+      <label for="first_name">Last Name</label>
+    </div>
+    <div class="input-field">
+      <input type="text" name="ai_name" placeholder="AI Name" class="validate">
+      <label for="first_name">AI Name</label>
+    </div>
+    <input type="submit" value="Upload" class="btn">
+  </form>
+</div>
+{% endblock %}

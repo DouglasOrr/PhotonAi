@@ -1,75 +1,53 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <title>Photonai</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/static/lib/all.css">
-    <link rel="stylesheet" href="/static/css/player.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <script type="text/javascript" src="/static/lib/all.js"></script>
-    <script type="text/javascript" src="/static/js/player.js"></script>
-  </head>
-  <body>
-    <!-- Nav Bar -->
-    <nav>
-      <div class="nav-wrapper">
-	<a href="/" class="brand-logo left">
-	  <i class="material-icons">navigation</i>
-	  PhotonAI
-	</a>
-	<ul id="nav-mobile" class="right">
-	  <li><a href="/leaderboard">Leaderboard</a></li>
-	  <li><a href="/history">History</a></li>
-	  <li><a href="/player">Player</a></li>
-	  <li><a class="btn" href="/uploader">Upload</a></li>
-	</ul>
-      </div>
-    </nav>
-    <div class="container">
-      <!-- Title Bar -->
-      <div class="row">
-	<span class="player-title"></span>
-	<div class="file-field input-field replay-file-holder">
-	  <div class="btn">
-	    <span>Replay File</span>
-	    <input type="file" class="replay-file">
-	  </div>
-	</div>
-      </div>
-      <!-- Player -->
-      <div class="row player-canvas-holder">
-        <canvas class="player-canvas">
-        </canvas>
-      </div>
-      <!-- Player Controls -->
-      <div class="row player-controls-holder">
-	<div class="player-seek-holder range-field">
-	  <input type="range" class="player-seek" value="0">
-	</div>
-	<!-- Must be after the seek, as we're using padding (otherwise would overlay) -->
-	<div class="btn-group player-buttons-holder">
-	  <button class="btn player-start">
-	    <i class="material-icons">skip_previous</i>
-	  </button>
-	  <button class="btn player-play">
-	    <i class="material-icons">play_arrow</i>
-	  </button>
-	  <button class="btn player-restart">
-	    <i class="material-icons">replay</i>
-	  </button>
-	  <button class="btn player-pause">
-	    <i class="material-icons">pause</i>
-	  </button>
-	  <button class="btn player-end">
-	    <i class="material-icons">skip_next</i>
-	  </button>
-	</div>
-      </div>
-      <!-- Alerts -->
-      <div class="alert alert-danger alert-dismissable fade in">
-        <a href="#" class="close">&times;</a>
-	<p class="alert-text"/>
-      </div>
+{% extends "layout.html" %}
+
+{% block head %}
+<script type="text/javascript" src="/static/js/player.js"></script>
+<link rel="stylesheet" href="/static/css/player.css">
+{% endblock %}
+
+{% block body %}
+<!-- Title Bar -->
+<div class="row">
+  <span class="player-title"></span>
+  <div class="file-field input-field replay-file-holder">
+    <div class="btn">
+      <span>Replay File</span>
+      <input type="file" class="replay-file">
     </div>
-  </body>
-</html>
+  </div>
+</div>
+<!-- Player -->
+<div class="row player-canvas-holder">
+  <canvas class="player-canvas">
+  </canvas>
+</div>
+<!-- Player Controls -->
+<div class="row player-controls-holder">
+  <div class="player-seek-holder range-field">
+    <input type="range" class="player-seek" value="0">
+  </div>
+  <!-- Must be after the seek, as we're using padding (otherwise would overlay) -->
+  <div class="btn-group player-buttons-holder">
+    <button class="btn player-start">
+      <i class="material-icons">skip_previous</i>
+    </button>
+    <button class="btn player-play">
+      <i class="material-icons">play_arrow</i>
+    </button>
+    <button class="btn player-restart">
+      <i class="material-icons">replay</i>
+    </button>
+    <button class="btn player-pause">
+      <i class="material-icons">pause</i>
+    </button>
+    <button class="btn player-end">
+      <i class="material-icons">skip_next</i>
+    </button>
+  </div>
+</div>
+<!-- Alerts -->
+<div class="alert alert-danger alert-dismissable fade in">
+  <a href="#" class="close">&times;</a>
+  <p class="alert-text"/>
+</div>
+{% endblock %}

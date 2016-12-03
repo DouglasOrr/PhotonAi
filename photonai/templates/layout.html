@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Photonai</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/lib/all.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="/static/css/photonai.css">
+    <script type="text/javascript" src="/static/lib/all.js"></script>
+    {% block head %}{% endblock %}
+  </head>
+  <body>
+    <!-- Nav Bar -->
+    <nav>
+      <div class="nav-wrapper">
+	<a href="/" class="brand-logo left">
+	  <i class="material-icons">navigation</i>
+	  PhotonAI
+	</a>
+	<ul id="nav-mobile" class="right">
+	  <li><a href="/leaderboard">Leaderboard</a></li>
+	  <li><a href="/history">History</a></li>
+	  <li><a href="/player">Player</a></li>
+	  <li><a class="btn" href="/uploader">Upload</a></li>
+	</ul>
+      </div>
+    </nav>
+    <!-- Content -->
+    <div class="container">
+      {% block body %}{% endblock %}
+    </div>
+  </body>
+</html>
