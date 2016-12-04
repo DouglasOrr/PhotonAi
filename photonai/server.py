@@ -3,16 +3,25 @@ import fastavro
 import flask
 import io
 import click
-import yaml
+import photonai.config
+import photonai.db
 
 
 app = flask.Flask(__name__)
 
-SETTINGS = dict(
-    replay_folder=os.path.abspath(
-        os.path.join(__file__, '../static/.tmp/replays')),
-    db=None
-)
+
+def get_db():
+    db = getattr(flask.g, 'database', None)
+    if db is None:
+        db = flask.g.database = photonai.db.Session(**app.config['DATABASE'])
+    return db
+
+
+@app.teardown_appcontext
+def close_db(exception):
+    db = getattr(flask.g, 'database', None)
+    if db is not None:
+        db.close()
 
 
 @app.route('/')
@@ -48,7 +57,7 @@ def upload():
         encoding='utf-8'
     ).read()
 
-    SETTINGS['db'].upload(full_name, ai_file)
+    get_db().upload(full_name, ai_file)
 
     return flask.redirect('/leaderboard')
 
@@ -60,7 +69,8 @@ def player():
 
 @app.route('/replay/<name>')
 def replay(name):
-    replay_file = flask.safe_join(SETTINGS['replay_folder'], '%s.avro' % name)
+    replay_file = flask.safe_join(app.config['REPLAY_FOLDER'],
+                                  '%s.avro' % name)
 
     with open(replay_file, 'rb') as f:
         return flask.json.jsonify(list(fastavro.reader(f)))
@@ -69,24 +79,23 @@ def replay(name):
 DEFAULT_CONFIG = dict(
     port=5000,
     debug=True,
+    db=None,
+    replay_folder=None,
 )
 
 
-@click.command()
+@click.command('server')
 @click.option('-c', '--config', type=click.Path(exists=True, dir_okay=False))
 def cli(config):
-    config_values = DEFAULT_CONFIG.copy()
-    if config is not None:
-        with open(config, 'r') as f:
-            config_values.update(yaml.load(f.read()))
-
-    if 'db' in config_values:
-        import photonai.db
-        SETTINGS['db'] = photonai.db.Session(**config_values['db'])
+    '''Start a server to upload bots & show tournament results.
+    '''
+    config = photonai.config.load(DEFAULT_CONFIG, config)
+    app.config['DATABASE'] = config['db']
+    app.config['REPLAY_FOLDER'] = config['replay_folder']
 
     app.run(host='0.0.0.0',
-            port=config_values['port'],
-            debug=config_values['debug'],
+            port=config['port'],
+            debug=config['debug'],
             extra_files=os.listdir('photonai/templates'))
 
 

@@ -6,10 +6,10 @@ import sys
 
 try:
     subprocess.run(
-        'python -m photonai'
-        ' photonai/tests/bots/nothing.py'
-        ' photonai/tests/bots/spiral.py'
-        ' /tmp/simulation.avro',
+        'python -m photonai run'
+        ' -b photonai/tests/bots/nothing.py'
+        ' -b photonai/tests/bots/spiral.py'
+        ' -o /tmp/simulation.avro',
         shell=True, check=True,
         stderr=subprocess.PIPE)
 
