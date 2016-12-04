@@ -10,5 +10,7 @@ setuptools.setup(
         'fastavro',
         'flask',
         'numpy',
+        'pymssql',
+        'pyyaml',
     ],
 )

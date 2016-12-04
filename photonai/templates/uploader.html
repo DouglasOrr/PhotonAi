@@ -1,21 +1,40 @@
 {% extends "layout.html" %}
+
+{% block head %}
+<script type="text/javascript" src="/static/js/uploader.js"></script>
+{% endblock %}
+
 {% block body %}
 <h1>Upload AI</h1>
 <div class="row">
-  <form action="upload">
+  <form action="upload" method="post"
+        class="remember-input-form"
+        enctype=multipart/form-data>
     <div class="input-field">
-      <input type="text" name="first_name" placeholder="First Name" class="validate">
+      <input type="text" name="first_name" placeholder="First Name"
+             class="validate remember-input" required>
       <label for="first_name">First Name</label>
     </div>
     <div class="input-field">
-      <input type="text" name="last_name" placeholder="Last Name" class="validate">
-      <label for="first_name">Last Name</label>
+      <input type="text" name="last_name" placeholder="Last Name"
+             class="validate remember-input" required>
+      <label for="last_name">Last Name</label>
     </div>
     <div class="input-field">
-      <input type="text" name="ai_name" placeholder="AI Name" class="validate">
-      <label for="first_name">AI Name</label>
+      <input type="text" name="ai_name" placeholder="AI Name"
+             class="validate remember-input">
+      <label for="ai_name">AI Name (optional)</label>
     </div>
-    <input type="submit" value="Upload" class="btn">
+    <div class="file-field input-field">
+      <div class="btn">
+        <span>File</span>
+        <input type="file" name="ai_file" accept=".py">
+      </div>
+      <div class="file-path-wrapper">
+        <input type="text" class="file-path validate" required>
+      </div>
+    </div>
+    <input type="submit" value="Upload" class="btn" style="float: right;">
   </form>
 </div>
 {% endblock %}

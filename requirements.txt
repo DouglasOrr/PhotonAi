@@ -7,3 +7,4 @@ nose
 nose-parameterized
 numpy
 pymssql
+pyyaml

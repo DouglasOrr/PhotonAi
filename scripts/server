@@ -1,4 +1,4 @@
 docker run --rm -it --name photonai-server \
     -v `pwd`:/usr/src -w /usr/src          \
     -p 5000:5000                           \
-    photonai python -m photonai.web
+    photonai env PYTHONPATH=/usr/src python -m photonai.web $@
