@@ -18,4 +18,4 @@ browserify scripts/lib.js -o "${LIB}/all.js"
 cat "${MATERIALIZE}/dist/css/materialize.min.css" \
     > "${LIB}/all.css"
 
-cp -r "${MATERIALIZE}/dist/fonts/roboto/" "${FONTS}/roboto"
+cp -r ${MATERIALIZE}/dist/fonts/* "${FONTS}/"
