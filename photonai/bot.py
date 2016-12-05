@@ -1,6 +1,7 @@
 import fastavro
 import sys
 import subprocess
+import random
 from . import schema, world
 
 
@@ -37,6 +38,12 @@ class Bot:
         returns -- Bot.RESPONSE -- the control to apply for the ship
         '''
         raise NotImplementedError
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
 
     def close(self):
         '''Dispose any resources associated with this bot.
@@ -121,3 +128,21 @@ class SubprocessBot(Bot):
         self._request.write(request)
         _safe_flush(self._request)
         return next(self._response)
+
+
+class DockerPythonBot(SubprocessBot):
+    '''A bot that forwards to an Avro stdin/stdout streaming subprocess
+    in docker.
+    '''
+    def __init__(self, path, container, stderr):
+        self._container_name = 'bot-%x' % random.randint(0, 1 << 32)
+        super().__init__(
+            command=['docker', 'run', '--rm', '-i',
+                     '-v', '%s:/bot.py' % path,
+                     '--name', self._container_name,
+                     container, 'python3', '/bot.py'],
+            stderr=stderr)
+
+    def close(self):
+        subprocess.check_call(['docker', 'kill', self._container_name])
+        super().close()

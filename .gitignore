@@ -5,4 +5,5 @@ gen/
 lib/
 fonts/
 local/
+replays/
 node_modules/

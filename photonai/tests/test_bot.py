@@ -10,7 +10,7 @@ def subprocess_bot(bot_module):
     project_path = os.path.abspath(os.path.join(__file__, '../../..'))
     return bot.SubprocessBot(
         ['env', 'PYTHONPATH=%s' % project_path,
-         'python', bot_module.__file__],
+         'python3', bot_module.__file__],
         stderr=sys.stderr)
 
 

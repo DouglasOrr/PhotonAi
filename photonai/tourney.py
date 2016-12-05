@@ -29,14 +29,13 @@ DEFAULT_CONFIG = dict(
 )
 
 
-def load(bot):
+def load_bot(bot, stack):
     '''Load a bot spec with a 'script' key, and add a 'path' key.
     '''
-    f = tempfile.NamedTemporaryFile()
+    f = stack.enter_context(tempfile.NamedTemporaryFile())
     f.write(bot['script'].encode('utf8'))
     f.flush()
-    bot['path'] = f.name
-    return f
+    return stack.enter_context(photonai.run.load_bot(f.name))
 
 
 class NotEnoughBotsError(Exception):
@@ -52,8 +51,8 @@ def run(config):
         if len(bots) < 2:
             raise NotEnoughBotsError
         bot_a, bot_b = bots
-        stack.enter_context(load(bot_a))
-        stack.enter_context(load(bot_b))
+        bots = [(bot, load_bot(bot, stack)) for bot in bots]
+
         map = random.choice(config['maps'])
         seed = random.randint(0, 2 ** 31)
 
@@ -65,7 +64,7 @@ def run(config):
         # Play the game
         tmp_out = stack.enter_context(tempfile.NamedTemporaryFile())
         result = photonai.run.run_game(
-            bots=[bot_a, bot_b],
+            bots=bots,
             writer=photonai.run.AvroWriter(tmp_out),
             seed=seed,
             map=map,

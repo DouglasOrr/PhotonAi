@@ -17,10 +17,10 @@ from . import game
 _project_path = os.path.abspath(os.path.join(__file__, '../..'))
 
 
-def _load_bot(path):
-    return photonai.bot.SubprocessBot(
-        ['env', 'PYTHONPATH=%s' % _project_path, 'python', path],
-        stderr=sys.stderr)
+def load_bot(path):
+    path = os.path.join(os.environ.get('HOST_ROOT'), path)
+    return photonai.bot.DockerPythonBot(
+        path, 'photonai:latest', stderr=sys.stderr)
 
 
 def _stop_condition(nbots, time_limit):
@@ -77,14 +77,11 @@ class JsonWriter:
 def run_game(bots, map, writer, seed, time_limit, step_duration):
     '''Run a game (randomly but repeatedly set up based on `seed`).
 
-    bots -- a list of {name: NAME, version: VERSION, path: PATH}
-    records
+    bots -- a list of bots as per photonai.game.run_game
     '''
     random = np.random.RandomState(seed)
     map = getattr(photonai.maps, map).Map(random.randint(2 ** 32))
-    bots = [(dict(name=bot['name'], version=bot['version']),
-             _load_bot(bot['path']))
-            for bot in bots]
+    bots = bots.copy()
     random.shuffle(bots)
 
     steps = game.run_game(
@@ -152,7 +149,8 @@ def cli(config, **args):
         else:
             writer = JsonWriter(stack.enter_context(open(config['out'], 'w')))
 
-        bots = [dict(name=path, version=0, path=path)
+        bots = [(dict(name=path, version=0),
+                 stack.enter_context(load_bot(path)))
                 for path in config['bots']
                 for _ in range(config['repeat_bots'])]
 

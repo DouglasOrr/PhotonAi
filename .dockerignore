@@ -1,6 +1,7 @@
 __pycache__
 .git/
 local/
+replays/
 node_modules/
 photonai/static/gen/
 photonai/static/lib/
