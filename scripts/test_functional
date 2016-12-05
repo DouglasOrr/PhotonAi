@@ -8,7 +8,7 @@ try:
     subprocess.run(
         'python3 -m photonai run'
         ' -b photonai/tests/bots/nothing.py'
-        ' -b photonai/tests/bots/spiral.py'
+        ' -b examples/spiral.py'
         ' -o /tmp/simulation.avro'
         ' --force',
         shell=True, check=True,

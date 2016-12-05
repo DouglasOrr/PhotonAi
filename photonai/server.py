@@ -117,7 +117,9 @@ def cli(config):
     app.run(host='0.0.0.0',
             port=config['port'],
             debug=config['debug'],
-            extra_files=os.listdir('photonai/templates'))
+            extra_files=os.listdir(os.path.join(
+                os.path.dirname(__file__),
+                'templates')))
 
 
 if __name__ == '__main__':
