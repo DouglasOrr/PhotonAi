@@ -27,16 +27,20 @@ DEFAULT_CONFIG = dict(
     time_limit=60,
     step_duration=0.01,
     timeout=0.1,
+    image='douglasorr/photonai',
 )
 
 
-def load_bot(bot, timeout, stack):
+def load_bot(bot, config, stack):
     '''Load a bot spec with a 'script' key, and add a 'path' key.
     '''
     f = stack.enter_context(tempfile.NamedTemporaryFile())
     f.write(bot['script'].encode('utf8'))
     f.flush()
-    return stack.enter_context(photonai.run.load_bot(f.name, timeout))
+    return stack.enter_context(
+        photonai.run.load_bot(f.name,
+                              image=config['image'],
+                              timeout=config['timeout']))
 
 
 class NotEnoughBotsError(Exception):
@@ -52,7 +56,7 @@ def run(config):
         if len(bots) < 2:
             raise NotEnoughBotsError
         bot_a, bot_b = bots
-        bots = [(bot, load_bot(bot, config['timeout'], stack))
+        bots = [(bot, load_bot(bot, config, stack))
                 for bot in bots]
 
         map = random.choice(config['maps'])
