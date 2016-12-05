@@ -99,7 +99,7 @@ DEFAULT_CONFIG = dict(
     db=None,
     replay_folder=None,
     leaderboard_window=100,
-    history_limit=400,
+    history_limit=200,
 )
 
 

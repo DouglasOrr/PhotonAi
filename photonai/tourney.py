@@ -7,10 +7,12 @@ import tempfile
 import shutil
 import os
 import contextlib
+import logging
+import time
+
 import photonai.config
 import photonai.db
 import photonai.run
-import logging
 
 
 DEFAULT_CONFIG = dict(
@@ -37,12 +39,19 @@ def load(bot):
     return f
 
 
+class NotEnoughBotsError(Exception):
+    pass
+
+
 def run(config):
     with contextlib.ExitStack() as stack:
         db = stack.enter_context(photonai.db.Session(**config['db']))
 
         # Randomly sample a game to play
-        bot_a, bot_b = db.sample_bots(2)
+        bots = db.sample_bots(2)
+        if len(bots) < 2:
+            raise NotEnoughBotsError
+        bot_a, bot_b = bots
         stack.enter_context(load(bot_a))
         stack.enter_context(load(bot_b))
         map = random.choice(config['maps'])
@@ -108,7 +117,11 @@ def cli(config):
         os.makedirs(config['replay_folder'])
 
     while True:
-        run(config)
+        try:
+            run(config)
+        except NotEnoughBotsError:
+            logging.debug('Not enough bots to run a game')
+            time.sleep(10)
 
 
 if __name__ == '__main__':
