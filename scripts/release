@@ -1,0 +1,19 @@
+if [ -z "$1" ]; then exit 1; fi
+
+set -e
+set -o xtrace
+
+VERSION="$1"
+RELEASE="douglasorr/photonai:${VERSION}"
+
+echo "Releasing version ${VERSION}"
+
+./scripts/build
+
+docker tag photonai:latest "${RELEASE}"
+docker push "${RELEASE}"
+
+docker tag photonai:latest douglasorr/photonai:latest
+docker push douglasorr/photonai:latest
+
+git push origin HEAD:refs/tags/${VERSION}
