@@ -17,10 +17,12 @@ from . import game
 _project_path = os.path.abspath(os.path.join(__file__, '../..'))
 
 
-def load_bot(path):
-    path = os.path.join(os.environ.get('HOST_ROOT'), path)
+def load_bot(path, timeout):
     return photonai.bot.DockerPythonBot(
-        path, 'photonai:latest', stderr=sys.stderr)
+        os.path.join(os.environ.get('HOST_ROOT'), path),
+        'photonai:latest',
+        stderr=sys.stderr,
+        timeout=timeout)
 
 
 def _stop_condition(nbots, time_limit):
@@ -105,6 +107,7 @@ DEFAULT_CONFIG = dict(
     force=False,
     repeat_bots=1,
     time_limit=60.0,
+    timeout=0.1,
 )
 
 
@@ -150,7 +153,7 @@ def cli(config, **args):
             writer = JsonWriter(stack.enter_context(open(config['out'], 'w')))
 
         bots = [(dict(name=path, version=0),
-                 stack.enter_context(load_bot(path)))
+                 stack.enter_context(load_bot(path, config['timeout'])))
                 for path in config['bots']
                 for _ in range(config['repeat_bots'])]
 

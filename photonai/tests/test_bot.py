@@ -11,7 +11,8 @@ def subprocess_bot(bot_module):
     return bot.SubprocessBot(
         ['env', 'PYTHONPATH=%s' % project_path,
          'python3', bot_module.__file__],
-        stderr=sys.stderr)
+        stderr=sys.stderr,
+        timeout=0.1)
 
 
 # c.f. bots/nothing.py

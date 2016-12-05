@@ -261,7 +261,7 @@ class Controllers:
         try:
             return self._id_to_bot[id](step)
         except Exception as e:
-            logging.error('Bot %d error %s', id, e)
+            logging.error('Bot %d error %r', id, e)
             del self._id_to_bot[id]
 
     def __call__(self, step):

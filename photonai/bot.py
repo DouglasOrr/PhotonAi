@@ -2,6 +2,7 @@ import fastavro
 import sys
 import subprocess
 import random
+import concurrent.futures
 from . import schema, world
 
 
@@ -106,7 +107,7 @@ class SimpleBot(Bot):
 class SubprocessBot(Bot):
     '''A bot that forwards to an Avro stdin/stdout streaming subprocess.
     '''
-    def __init__(self, command, stderr):
+    def __init__(self, command, stderr, timeout):
         self._process = subprocess.Popen(
             command,
             stdin=subprocess.PIPE,
@@ -115,33 +116,38 @@ class SubprocessBot(Bot):
         self._request = fastavro._writer.Writer(
             self._process.stdin, Bot.REQUEST)
         _safe_flush(self._request)
-        self._response = fastavro.reader(
-            self._process.stdout)
+        self._response = fastavro.reader(self._process.stdout)
+        self._pool = concurrent.futures.ThreadPoolExecutor(1)
+        self._timeout = timeout
 
     def close(self):
+        self._pool.shutdown()
         try:
             self._process.communicate(timeout=1)
         except subprocess.TimeoutExpired:
             self._process.kill()
 
-    def __call__(self, request):
+    def execute(self, request):
         self._request.write(request)
         _safe_flush(self._request)
         return next(self._response)
+
+    def __call__(self, request):
+        return self._pool.submit(self.execute, request).result(self._timeout)
 
 
 class DockerPythonBot(SubprocessBot):
     '''A bot that forwards to an Avro stdin/stdout streaming subprocess
     in docker.
     '''
-    def __init__(self, path, container, stderr):
+    def __init__(self, path, container, **args):
         self._container_name = 'bot-%x' % random.randint(0, 1 << 32)
         super().__init__(
             command=['docker', 'run', '--rm', '-i',
                      '-v', '%s:/bot.py' % path,
                      '--name', self._container_name,
                      container, 'python3', '/bot.py'],
-            stderr=stderr)
+            **args)
 
     def close(self):
         try:
