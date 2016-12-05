@@ -14,34 +14,35 @@
     <th>W / D / L</th>
     <th>Played</th>
   </thead>
-{% for bot in leaderboard %}
-<tr class="{{ 'grey-text text-lighten-1' if bot.disqualified else '' }}">
-  <td><!-- # -->
-    {{ loop.index }}
-  </td>
-  <td><!-- Name -->
-    {{ bot.name.split(':')[0] }}
-  </td>
-  <td><!-- AI -->
-    {{ bot.name.split(':')[1] }} v{{ bot.version }}
-  </td>
-  <td><!-- Won/Drawn/Lost -->
-    <strong>{{ bot.won }}</strong> / {{ bot.drawn }} / {{ bot.played - bot.won - bot.drawn }}
-  </td>
-  <td><!-- Played -->
-    {{ bot.played }}
-    {% if bot.played == 0 and not bot.disabled and not bot.disqualified %}
+
+  {% for bot in leaderboard %}
+  <tr class="{{ 'grey-text text-lighten-1' if bot.disqualified else '' }}">
+    <td><!-- # -->
+      {{ loop.index }}
+    </td>
+    <td><!-- Name -->
+      {{ bot.name.split(':')[0] }}
+    </td>
+    <td><!-- AI -->
+      {{ bot.name.split(':')[1] }} v{{ bot.version }}
+    </td>
+    <td><!-- Won/Drawn/Lost -->
+      <strong>{{ bot.won }}</strong> / {{ bot.drawn }} / {{ bot.played - bot.won - bot.drawn }}
+    </td>
+    <td><!-- Played -->
+      {{ bot.played }}
+      {% if bot.played == 0 and not bot.disabled and not bot.disqualified %}
       <span class="new badge green" data-badge-caption="new"></span>
-    {% endif %}
-    {% if bot.disabled %}
+      {% endif %}
+      {% if bot.disabled %}
       <span class="new badge orange" data-badge-caption="disabled"></span>
-    {% endif %}
-    {% if bot.disqualified %}
+      {% endif %}
+      {% if bot.disqualified %}
       <span class="new badge red" data-badge-caption="disqualified"></span>
-    {% endif %}
-  </td>
-</tr>
-{% endfor %}
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
 </table>
 
 {% endblock %}

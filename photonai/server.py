@@ -17,6 +17,13 @@ def get_db():
     return db
 
 
+def replay_path(id):
+    if app.config['REPLAY_PATH'] is not None:
+        path = flask.safe_join(app.config['REPLAY_PATH'], '%d.avro' % id)
+        if os.path.exists(path):
+            return path
+
+
 @app.teardown_appcontext
 def close_db(exception):
     db = getattr(flask.g, 'database', None)
@@ -41,7 +48,14 @@ def leaderboard():
 
 @app.route('/history')
 def history():
-    return flask.render_template('layout.html')  # TODO
+    n = app.config['HISTORY_LIMIT']
+    history = get_db().history(n)
+    for d in history:
+        d['has_replay'] = replay_path(d['id']) is not None
+    return flask.render_template(
+        'history.html',
+        history=history,
+        history_limit=n)
 
 
 @app.route('/uploader')
@@ -67,17 +81,15 @@ def upload():
     return flask.redirect('/leaderboard')
 
 
-@app.route('/player')
-def player():
-    return flask.render_template('player.html')
+@app.route('/player', defaults=dict(id=None))
+@app.route('/player/<id>')
+def player(id):
+    return flask.render_template('player.html', game_id=id)
 
 
-@app.route('/replay/<name>')
-def replay(name):
-    replay_file = flask.safe_join(app.config['REPLAY_FOLDER'],
-                                  '%s.avro' % name)
-
-    with open(replay_file, 'rb') as f:
+@app.route('/replay/<int:id>')
+def replay(id):
+    with open(replay_path(id), 'rb') as f:
         return flask.json.jsonify(list(fastavro.reader(f)))
 
 
@@ -87,6 +99,7 @@ DEFAULT_CONFIG = dict(
     db=None,
     replay_folder=None,
     leaderboard_window=100,
+    history_limit=400,
 )
 
 
@@ -97,8 +110,9 @@ def cli(config):
     '''
     config = photonai.config.load(DEFAULT_CONFIG, config)
     app.config['DATABASE'] = config['db']
-    app.config['REPLAY_FOLDER'] = config['replay_folder']
+    app.config['REPLAY_PATH'] = os.path.abspath(config['replay_folder'])
     app.config['LEADERBOARD_WINDOW'] = config['leaderboard_window']
+    app.config['HISTORY_LIMIT'] = config['history_limit']
 
     app.run(host='0.0.0.0',
             port=config['port'],

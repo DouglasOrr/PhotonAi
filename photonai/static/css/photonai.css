@@ -11,6 +11,10 @@ h2 {
     margin-left: 10px;
 }
 
-.disqualified {
-    color: gray;
+/* Styles */
+.winner {
+    font-weight: bold;
+}
+.loser {
+    color: #800;
 }

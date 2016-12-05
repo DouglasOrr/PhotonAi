@@ -88,6 +88,22 @@ class Session:
                          script=script)
                     for id, name, upload_version, script in cursor]
 
+    def history(self, n):
+        with self._connection.cursor() as cursor:
+            cursor.execute('''
+            SELECT TOP(%d) g.id, g.map, a.name, b.name, w.name
+            FROM games g
+            INNER JOIN bots a ON a.id = g.bot_a
+            INNER JOIN bots b ON b.id = g.bot_b
+            LEFT JOIN bots w ON w.id = g.winner
+            ORDER BY g.id DESC
+            ''', (n,))
+            return [dict(id=id,
+                         map=map,
+                         a=a, b=b,
+                         winner=winner)
+                    for id, map, a, b, winner in cursor]
+
     def add_game(self, bot_a, bot_b, winner, map, seed):
         with self._connection.cursor() as cursor:
             cursor.execute('''

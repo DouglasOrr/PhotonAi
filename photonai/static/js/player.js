@@ -267,6 +267,16 @@ function resize_canvas() {
 	.attr('height', settings.canvas_aspect * width);
 }
 
+function download_replay(id) {
+    console.log("Download replay " + id)
+    $.get({url: '/replay/' + id,
+           cache: false
+          }).then(function (response) {
+              setup_log(response);
+              set_filename("Replay " + id);
+          });
+}
+
 $(function() {
     set_playing(false);
     $('.player-start').on('click', function (e) {

@@ -3,6 +3,13 @@
 {% block head %}
 <script type="text/javascript" src="/static/js/player.js"></script>
 <link rel="stylesheet" href="/static/css/player.css">
+<script type="text/javascript">
+  {% if game_id %}
+  $(function() {
+    download_replay({{ game_id }});
+  });
+  {% endif %}
+</script>
 {% endblock %}
 
 {% block body %}

@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<hgroup>
+  <h1>History</h1>
+  <h2>Last
+    {{ history|length if history|length < history_limit else history_limit }}
+    games.
+  </h2>
+</hgroup>
+
+<table class="highlight">
+  <thead>
+    <th>Match</th>
+    <th>Map</th>
+    <th>Replay</th>
+  </thead>
+
+  {% for game in history %}
+  <tr>
+    <td><!-- Participants -->
+      <span class="{{ {game.a: 'winner', game.b: 'loser'}.get(game.winner, '') }}">
+        {{ game.a }}
+      </span>
+      vs
+      <span class="{{ {game.b: 'winner', game.a: 'loser'}.get(game.winner, '') }}">
+        {{ game.b }}
+      </span>
+    </td>
+    <td><!-- Name -->
+      {{ game.map }}
+    </td>
+    <td><!-- Replay -->
+      <a class="btn btn-flat {{ 'disabled' if not game.has_replay }}" href="/player/{{ game.id }}">
+        Watch Replay
+      </a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+
+{% endblock %}
