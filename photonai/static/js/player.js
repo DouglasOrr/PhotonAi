@@ -57,7 +57,7 @@ function draw_pellet(ctx, body, space_dimensions) {
     ctx.stroke();
 }
 
-function draw(space_dimensions, objects, ship_colors) {
+function draw(space_dimensions, objects, ships) {
     var canvas = $('.player-canvas')[0];
     var ctx = canvas.getContext('2d');
 
@@ -84,7 +84,7 @@ function draw(space_dimensions, objects, ship_colors) {
     Object.keys(objects).forEach(function(id) {
 	var obj = objects[id];
 	if (is_ship(obj)) {
-	    draw_ship(ctx, obj.body, ship_colors[id]);
+	    draw_ship(ctx, obj.body, ships[id].color);
 	} else if (is_pellet(obj)) {
 	    draw_pellet(ctx, obj.body, space_dimensions);
 	} else {
@@ -95,7 +95,7 @@ function draw(space_dimensions, objects, ship_colors) {
 
 // Generates color codes to assign to ships.
 function ship_palette() {
-    var colors = ['#f00', '#0f0', '#22f'];
+    var colors = ['#fc0', '#d3f', '#0e0', '#f00'];
     var index = -1;
     return function () {
 	index = (index + 1) % colors.length;
@@ -108,14 +108,14 @@ var state = {
     n: 0,
     space_dimensions: null,
     states: null,
-    ship_colors: null
+    ships: null
 }
 
 function redraw() {
     // Draw the current state
     draw(state.space_dimensions,
 	 state.states[state.n],
-	 state.ship_colors);
+	 state.ships);
 }
 
 function refresh_playing() {
@@ -170,7 +170,7 @@ function setup_log(log) {
     state.space_dimensions = log[0].data.dimensions;
     state.n = 0;
     state.states = [];
-    state.ship_colors = {};
+    state.ships = {};
 
     var gen_ship_color = ship_palette();
     var objects = {};
@@ -200,8 +200,10 @@ function setup_log(log) {
 	    } else {
 		// Should be {Planet, Ship, Pellet}.Create
                 objects[e.id] = e.data;
-		if (is_ship(e.data) && !(e.id in state.ship_colors)) {
-		    state.ship_colors[e.id] = gen_ship_color();
+		if (is_ship(e.data) && !(e.id in state.ships)) {
+                    var name = e.data.controller.name + " v" + e.data.controller.version;
+                    state.ships[e.id] = {color: gen_ship_color(),
+                                         name: name};
 		}
 	    }
 	});
@@ -234,26 +236,36 @@ function read_avro(file, on_load) {
     avsc.createBlobDecoder(file, {'wrapUnions': true});
 }
 
-function set_filename(name) {
-    $('.player-title').text(name || 'No replay loaded...');
+function setup_log_and_title(name, log) {
+    $(".alert-holder").html("");
+    setup_log(log);
+    var title = name
+    title += '<div>' + Object.values(state.ships).map(function (ship) {
+        return '<div class="chip" style="color: ' + ship.color + '">' + ship.name + '</div>';
+    }).join(" vs ") + '</div>';
+    $('.player-title').html(title);
 }
 
 function read_file(e) {
     // User is loading a new file - we should hide any old errors
     $('.alert').hide();
-    set_filename();
 
     var file = e.target.files[0];
     if (file.name.endsWith(".jsonl") ||
 	file.name.endsWith(".json")) {
-	read_jsonl(file, setup_log);
-	set_filename(file.name);
+	read_jsonl(file, function (log) {
+            setup_log_and_title("Local " + file.name, log);
+        });
 
     } else {
-	$('.alert-text').html(
+        var alert_text =
 	    '<strong>Failed to load ' + file.name + '</strong>' +
-	    ' - extension not recognized (expected {.jsonl .json})');
-	$('.alert').show();
+	        ' - extension not recognized (expected {.jsonl .json})';
+
+        $(".alert-holder").html(
+            $('<div class="chip">' + alert_text +
+              '<i class="material-icons close">close</i>' +
+              '</div>'));
     }
     // Reset the state - otherwise it doesn't do what you'd expect if you
     // reload the same file
@@ -272,8 +284,7 @@ function download_replay(id) {
     $.get({url: '/replay/' + id,
            cache: false
           }).then(function (response) {
-              setup_log(response);
-              set_filename("Replay " + id);
+              setup_log_and_title("Game " + id, response);
           });
 }
 
@@ -303,10 +314,9 @@ $(function() {
 
     $('.alert').hide();
     $('.alert .close').on('click', function (e) {
-	$(e.target).parent().hide();
+        $(e.target).parent().hide();
     });
 
-    set_filename();
     $('.replay-file').on('change', read_file);
 
     resize_canvas();
@@ -314,10 +324,3 @@ $(function() {
 
     window.setInterval(tick, settings.tick_time);
 });
-
-// $(function() {
-//     var id = 'sample';  // TODO
-//     $.get({url: '/replay/' + id,
-//            cache: false
-//           }).then(log_loaded);
-// });

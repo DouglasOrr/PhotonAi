@@ -10,6 +10,9 @@
     display: inline-block;
     float: right;
 }
+.player-title .chip {
+    background: #aaa;
+}
 /* Player */
 .player-canvas {
     background: #000;
@@ -44,10 +47,10 @@
     pointer-events: auto;
 }
 /* Alerts */
-.alert {
-    margin-bottom: 0px;
+.alert-holder {
     position: fixed;
-    bottom: 0px;
-    left: 0px;
-    right: 0px;
+    bottom: 1em;
+}
+.alert-holder .chip {
+    background: #f88;
 }
