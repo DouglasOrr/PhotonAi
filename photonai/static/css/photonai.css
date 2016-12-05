@@ -1,8 +1,16 @@
 h1 {
     font-weight: 100;
 }
+h2 {
+    font-weight: 100;
+    font-size: 2em;
+}
 
 /* Nav Bar */
 .brand-logo {
     margin-left: 10px;
+}
+
+.disqualified {
+    color: gray;
 }

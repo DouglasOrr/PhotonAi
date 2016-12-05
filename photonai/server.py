@@ -31,7 +31,12 @@ def index():
 
 @app.route('/leaderboard')
 def leaderboard():
-    return flask.render_template('layout.html')  # TODO
+    window = app.config['LEADERBOARD_WINDOW']
+    return flask.render_template(
+        'leaderboard.html',
+        leaderboard=get_db().leaderboard(window),
+        leaderboard_window=window
+    )
 
 
 @app.route('/history')
@@ -81,6 +86,7 @@ DEFAULT_CONFIG = dict(
     debug=True,
     db=None,
     replay_folder=None,
+    leaderboard_window=100,
 )
 
 
@@ -92,6 +98,7 @@ def cli(config):
     config = photonai.config.load(DEFAULT_CONFIG, config)
     app.config['DATABASE'] = config['db']
     app.config['REPLAY_FOLDER'] = config['replay_folder']
+    app.config['LEADERBOARD_WINDOW'] = config['leaderboard_window']
 
     app.run(host='0.0.0.0',
             port=config['port'],
