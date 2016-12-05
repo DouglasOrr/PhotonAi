@@ -1,6 +1,7 @@
 from . import world, util
 import numpy as np
 import itertools as it
+import logging
 
 
 def _is_collision(subject, others):
@@ -250,22 +251,32 @@ class Controllers:
         thrust=0.0,
     )
 
-    def __init__(self, world_, ids_bots):
+    def __init__(self, world_, id_to_bot):
         self._world = world_
-        self._ids_bots = ids_bots
+        self._id_to_bot = id_to_bot
         self.control = {id: Controllers.DEFAULT_STATE
-                        for id, bot in ids_bots}
+                        for id, bot in id_to_bot.items()}
+
+    def _call_bot(self, id, step):
+        try:
+            return self._id_to_bot[id](step)
+        except Exception as e:
+            logging.error('Bot %d error %s', id, e)
+            del self._id_to_bot[id]
 
     def __call__(self, step):
-        for id, bot in self._ids_bots:
+        # Must copy id_to_bot keys (to avoid concurrent modification)
+        for id in list(self._id_to_bot):
             ship = self._world.objects.get(id)
             if ship is None:
-                bot(dict(step=step, ship_id=None))
+                self._call_bot(id, dict(step=step, ship_id=None))
             else:
                 # obscure vision of other ships
                 ship_step = _remove_ship_updates(
                     step, _obscured_ships(self._world, ship))
-                self.control[id] = bot(dict(step=ship_step, ship_id=id))
+                control = self._call_bot(id, dict(step=ship_step, ship_id=id))
+                if control is not None:
+                    self.control[id] = control
 
 
 class Stop(Exception):
@@ -356,9 +367,10 @@ def run_game(map_spec, controller_bots, stop, step_duration):
                                           **controller)))
              for controller, _ in controller_bots]
 
-    controllers = Controllers(world_, [
-        (ship['id'], bot)
-        for ship, (_, bot) in zip(ships, controller_bots)])
+    controllers = Controllers(world_, {
+        ship['id']: bot
+        for ship, (_, bot) in zip(ships, controller_bots)
+    })
 
     # Helper function - create a 'step' & update the simulation state
     def step(data):

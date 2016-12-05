@@ -4,4 +4,4 @@ docker run --rm -it                              \
     -v /tmp:/tmp                                 \
     -e HOST_ROOT=`pwd`                           \
     -w /usr/src                                  \
-    photonai "${@}"
+    photonai-dev "${@}"

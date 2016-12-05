@@ -144,5 +144,8 @@ class DockerPythonBot(SubprocessBot):
             stderr=stderr)
 
     def close(self):
-        subprocess.check_call(['docker', 'kill', self._container_name])
+        try:
+            subprocess.check_call(['docker', 'kill', self._container_name])
+        except subprocess.CalledProcessError:
+            pass  # ignore closing errors - best effort
         super().close()

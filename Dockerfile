@@ -1,34 +1,8 @@
-FROM ubuntu:16.04
+FROM photonai-dev
 
-# Docker prerequisites
-RUN apt-get update                                            \
-    && apt-get upgrade -y                                     \
-    && apt-get install -y apt-transport-https ca-certificates \
-    && apt-key adv                                            \
-        --keyserver hkp://ha.pool.sks-keyservers.net:80       \
-        --recv-keys 58118E89F3A912897C070ADBF76221572C52609D  \
-    && echo "deb https://apt.dockerproject.org/repo ubuntu-xenial main" \
-    > /etc/apt/sources.list.d/docker.list
-
-# (Setup node just so we can use browserify... eugh!)
-RUN apt-get update                         \
-    && apt-get install -y                  \
-       docker-engine                       \
-       npm                                 \
-       python3                             \
-       python3-pip                         \
-    && apt-get clean                       \
-    && ln -s /usr/bin/nodejs /usr/bin/node \
-    && npm install -g browserify
-
-ENV LC_ALL=C.UTF-8 \
-    LANG=C.UTF-8
-
+# Install a copy of the app
 COPY . /tmp/app
-
-# Install the dependencies & a copy of the app
 RUN cd /tmp/app                                        \
     && ./scripts/build-web			       \
-    && pip3 install --no-cache-dir -r requirements.txt \
     && python3 setup.py install                        \
     && rm -r /tmp/app
