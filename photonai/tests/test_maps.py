@@ -11,6 +11,7 @@ all_maps = [
     (maps.singleton,),
     (maps.binary,),
     (maps.orbital,),
+    (maps.endtime,),
 ]
 
 
@@ -29,17 +30,18 @@ def test_validate(spec):
 
 @parameterized(all_maps)
 def test_deterministic(spec):
+    max_ships = 7  # must support at least 7 ships
     reference = spec.Map(100)
     space = reference.space
     planets = reference.planets
     ships = [reference.ship(test_schema.Controller.CREATE)
-             for _ in range(10)]
+             for _ in range(max_ships)]
     for x in range(10):
         m = spec.Map(100)
         assert m.space == space
         assert m.planets == planets
         m_ships = [m.ship(test_schema.Controller.CREATE)
-                   for _ in range(10)]
+                   for _ in range(max_ships)]
         assert m_ships == ships
 
 

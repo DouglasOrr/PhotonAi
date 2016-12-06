@@ -1,4 +1,4 @@
 '''Defines randomized factories for maps.
 '''
 
-from . import binary, empty, orbital, singleton  # noqa
+from . import binary, empty, endtime, orbital, singleton  # noqa
