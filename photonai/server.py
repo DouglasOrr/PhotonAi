@@ -122,12 +122,19 @@ def cli(config):
     app.config['LEADERBOARD_WINDOW'] = config['leaderboard_window']
     app.config['HISTORY_LIMIT'] = config['history_limit']
 
-    app.run(host='0.0.0.0',
-            port=config['port'],
-            debug=config['debug'],
-            extra_files=os.listdir(os.path.join(
-                os.path.dirname(__file__),
-                'templates')))
+    if config['debug']:
+        # Workzeug
+        app.run(host='0.0.0.0',
+                port=config['port'],
+                debug=True,
+                extra_files=os.listdir(os.path.join(
+                    os.path.dirname(__file__),
+                    'templates')))
+    else:
+        # gevent
+        import gevent.wsgi
+        http_server = gevent.wsgi.WSGIServer(('', config['port']), app)
+        http_server.serve_forever()
 
 
 if __name__ == '__main__':
