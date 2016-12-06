@@ -1,0 +1,1 @@
+docker run -d --name photonai-worker-${1-0} -v /tmp:/tmp -v /replays:/replays -v /var/run/docker.sock:/var/run/docker.sock -v `pwd`/config.yaml:/config.yaml douglasorr/photonai photonai tourney -c /config.yaml
