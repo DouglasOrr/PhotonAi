@@ -4,7 +4,7 @@ A simulator for an [AI challenge](http://photonai.cloudapp.net).
 
 ## Run locally
 
-Install Docker
+Install [Docker](https://docs.docker.com/engine/installation/linux/ubuntulinux/).
 
 Copy [run.sh](run.sh) and make executable (`chmod +x run.sh`).
 
