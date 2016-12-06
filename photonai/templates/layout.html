@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="/static/css/photonai.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <script type="text/javascript" src="/static/lib/all.js"></script>
+    <script type="text/javascript">
+      $(function() { $(".button-collapse").sideNav(); });
+    </script>
     {% block head %}{% endblock %}
   </head>
   <body>
@@ -17,13 +20,21 @@
 	  <i class="material-icons">navigation</i>
 	  PhotonAI
 	</a>
-	<ul id="nav-mobile" class="right">
-	  <li><a href="/leaderboard">Leaderboard</a></li>
-	  <li><a href="/history">History</a></li>
-	  <li><a href="/player">Player</a></li>
-	  <li><a href="/doc/photonai/index.html">Docs</a></li>
-	  <li><a class="btn" href="/uploader">Upload</a></li>
+        <a href="#" data-activates="mobile-side-nav" class="button-collapse right">
+          <i class="material-icons">menu</i>
+        </a>
+	<ul class="right hide-on-med-and-down">
+          {% block nav %}
+          <li><a href="/leaderboard">Leaderboard</a></li>
+          <li><a href="/history">History</a></li>
+          <li><a href="/player">Player</a></li>
+          <li><a href="/doc/photonai/index.html">Docs</a></li>
+          <li><a class="btn" href="/uploader">Upload</a></li>
+          {% endblock %}
 	</ul>
+        <ul id="mobile-side-nav" class="side-nav">
+          {{ self.nav() }}
+        </ul>
       </div>
     </nav>
     <!-- Content -->

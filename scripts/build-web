@@ -11,17 +11,20 @@ mkdir -p "${LIB}" "${FONTS}"
 
 npm install
 # hack https://github.com/Dogfalo/materialize/issues/3139
-cp "${MATERIALIZE}/js/date_picker/picker.js" "${MATERIALIZE}/bin"
+# cp "${MATERIALIZE}/js/date_picker/picker.js" "${MATERIALIZE}/bin"
 
 # js
-browserify scripts/lib.js -o "${LIB}/all.js"
+cat node_modules/jquery/dist/jquery.min.js \
+    node_modules/js-cookie/src/js.cookie.js \
+    node_modules/materialize-css/dist/js/materialize.min.js \
+    > "${LIB}/all.js"
 
 # css
-cat "${MATERIALIZE}/dist/css/materialize.min.css" \
+cat node_modules/materialize-css/dist/css/materialize.min.css \
     > "${LIB}/all.css"
 
 # fonts
-cp -r ${MATERIALIZE}/dist/fonts/* "${FONTS}/"
+cp -r node_modules/materialize-css/dist/fonts/* "${FONTS}"
 
 # docs
 env PYTHONPATH=. pdoc photonai --overwrite --html --html-dir "${DOC}"
