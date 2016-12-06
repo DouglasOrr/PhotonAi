@@ -9,6 +9,7 @@ import os
 import contextlib
 import logging
 import time
+import pymssql
 
 import photonai.config
 import photonai.db
@@ -127,6 +128,12 @@ def cli(config):
         except NotEnoughBotsError:
             logging.debug('Not enough bots to run a game')
             time.sleep(10)
+        except pymssql.OperationalError as e:
+            if 1 <= len(e.args) and e.args[0] == 40613:
+                logging.debug('Database currently unavailable %s', e)
+                time.sleep(10)
+            else:
+                raise
 
 
 if __name__ == '__main__':
