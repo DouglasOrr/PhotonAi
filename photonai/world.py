@@ -1,5 +1,11 @@
 '''Helpers which make it easier to work with the logs from
- photonai.schema'''
+ `photonai.schema`.
+
+The raw logs are event-based (i.e. each Step must be understood in the
+context of all preceding steps), but the `photonai.world.World` defined
+here is state-based, providing a snapshot of the current state of the
+game.
+'''
 
 from fastavro.writer import validate
 from . import schema
@@ -9,6 +15,9 @@ from .util import Vector
 class Item:
     '''Utility base class to make implementing create/update for specific
     game items simpler.
+
+    `update_clock` -- step number when this object was last updated (compare
+    with `photonai.world.World.clock` to see if this object is up-to-date).
     '''
     __slots__ = ('update_clock',)
 
@@ -51,6 +60,14 @@ class Item:
 
 
 class Space(Item):
+    '''Information about the overall space of the game (e.g. the dimensions
+    outside which ships will wrap around, and pellets destroyed).
+
+    `dimensions` -- 2D numpy array specifying size of the space.
+
+    `gravity` -- scalar strength of gravity (F = g m_1 m_2 / r).
+
+    '''
     __slots__ = Item.__slots__ + ('dimensions', 'gravity')
 
     @staticmethod
@@ -60,6 +77,20 @@ class Space(Item):
 
 
 class Body(Item):
+    '''Base class for 'bodies', which have position, size, mass.
+
+    `radius` -- scalar radius of the circular hitbox (for collisions).
+
+    `mass` -- scalar mass (used for gravity & acceleration).
+
+    `position` -- 2D numpy array of current position.
+
+    `velocity` -- 2D numpy array of velocity (change in position per time
+    unit).
+
+    `orientation` -- scalar orientation (use `photonai.util.direction` to find
+    the direction vector), measured clockwise from vertical (+Y).
+    '''
     __slots__ = Item.__slots__ + (
         'radius', 'mass',
         'position', 'velocity', 'orientation')
@@ -78,6 +109,29 @@ class Body(Item):
 
 
 class Weapon(Item):
+    '''Information about the weapon attached to a `photonai.world.Ship`.
+
+    `max_reload` -- scalar reload time when the weapon is "cool" (below
+    `max_temperature`).
+
+    `max_temperature` -- scalar temperature above which weapon must wait to be
+    able to fire (temperature increases by 1 when fired).
+
+    `temperature_decay` -- scalar time taken to decay from
+    `max_temperature + 1` back down to `max_temperature` (effectively the
+    reload time when the weapon is "hot").
+
+    `speed` -- scalar relative speed of ejected pellets.
+
+    `time_to_live` -- scalar time to live of ejected pellets.
+
+    `fired` -- `True` if the weapon was fired last step.
+
+    `reload` -- scalar current reload timer (when zero, the weapon may be
+    fired).
+
+    `temperature` -- scalar current temperature.
+    '''
     __slots__ = Item.__slots__ + (
         'max_reload', 'max_temperature', 'temperature_decay',
         'speed', 'time_to_live',
@@ -99,6 +153,18 @@ class Weapon(Item):
 
 
 class Controller(Item):
+    '''Information about control output for a bot.
+
+    `name` -- name of the controller
+
+    `version` -- upload version of the controller
+
+    `fire` -- control signal to fire the weapon
+
+    `rotate` -- control signal to rotate the ship
+
+    `thrust` -- control signal to apply thrust to the ship
+    '''
     __slots__ = Item.__slots__ + (
         'name', 'version', 'fire', 'rotate', 'thrust')
 
@@ -116,6 +182,11 @@ class Controller(Item):
 
 
 class Planet(Body):
+    '''A planet - usually large mass & radius, forming an obstacle.
+
+    `name` -- friendly name to identify the planet.
+
+    '''
     __slots__ = Body.__slots__ + ('name',)
 
     @staticmethod
@@ -129,6 +200,21 @@ class Planet(Body):
 
 
 class Ship(Body):
+    '''A ship controlled by an AI `controller`.
+    Note that the ship will wrap position (around (x, y) axes independently)
+    if it leaves `space.dimensions`.
+
+    `weapon` -- `photonai.world.Weapon`
+
+    `controller` -- `photonai.world.Controller`
+
+    `max_thrust` -- scalar maximum force
+    (s.t. `F = clamp(controller.thrust, 0, 1) * max_thrust`).
+
+    `max_rotate` -- scalar maximum rotation speed
+    (s.t. `A = clamp(controller.rotate, -1, 1) * max_rotate`).
+
+    '''
     __slots__ = Body.__slots__ + (
         'weapon', 'controller', 'max_thrust', 'max_rotate')
 
@@ -156,6 +242,12 @@ class Ship(Body):
 
 
 class Pellet(Body):
+    '''A small, fast, pellet fired from a `photonai.world.Weapon`.
+
+    `time_to_live` -- time remaining before the pellet self-destructs
+    (N.B. the pellet will destruct early if it goes outside
+    `space.dimensions`).
+    '''
     __slots__ = Body.__slots__ + ('time_to_live',)
 
     @staticmethod
@@ -171,6 +263,17 @@ class Pellet(Body):
 
 class World:
     '''Saves the visible world state, updated step-by-step.
+
+    `clock` -- step number of last update.
+
+    `time` -- time of last update.
+
+    `space` -- `photonai.world.Space`.
+
+    `objects` -- a dict of ID to some {`photonai.world.Ship`,
+    `photonai.world.Planet`, `photonai.world.Pellet`} currently surviving
+    top-level game objects.
+
     '''
     __slots__ = ('clock', 'time', 'space', 'objects')
 
@@ -200,6 +303,12 @@ class World:
 
         else:
             raise ValueError('Unrecognized event %s' % event)
+
+    def __str__(self):
+        return 'World {\n  space: %s\n  clock: %s\n%s\n}' % (
+            self.space,
+            self.clock,
+            '\n'.join('  - %s' % v for v in self.objects.values()))
 
     def __call__(self, step):
         if validate(step['data'], schema.Space.CREATE):

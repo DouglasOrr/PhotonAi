@@ -1,3 +1,6 @@
+'''A web server for viewing tournament results and replays.
+'''
+
 import os
 import fastavro
 import flask
@@ -91,6 +94,11 @@ def player(id):
 def replay(id):
     with open(replay_path(id), 'rb') as f:
         return flask.json.jsonify(list(fastavro.reader(f)))
+
+
+@app.route('/doc/<path:path>')
+def doc(path):
+    return flask.send_from_directory('static/doc', path)
 
 
 DEFAULT_CONFIG = dict(

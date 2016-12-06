@@ -1,3 +1,6 @@
+'''Define bot (AI) control interface to play the game.
+'''
+
 import fastavro
 import sys
 import subprocess
@@ -65,12 +68,18 @@ class Bot:
 
 
 class SimpleBot(Bot):
-    '''A bot that presents an simple interface to subclasses.
+    '''A bot that presents an useful interface to subclasses.
 
     Accumulates game state updates into a `photonai.world.World`, and
     provides a simple way to respond with control signals `SimpleBot.Control`.
+
+    Subclasses should implement `control = self.get_control(world, ship)`,
+    which is called at each timestep to control the ship.
     '''
+
     class Control:
+        '''The control signal returned from a `SimpleBot`.
+        '''
         __slots__ = ('fire', 'rotate', 'thrust')
 
         def __init__(self, fire=False, rotate=0.0, thrust=0.0):
@@ -94,12 +103,24 @@ class SimpleBot(Bot):
 
     def get_control(self, world, ship):
         '''Get the control signal for 'ship' in the current state of 'world'.
+        This is called for each game tick (as per `config["step_duration"]`).
 
-        world -- a photonai.world.World object containing all the known state
+        If this method throws an error, or takes too long to return (longer
+        than `config["timeout"]`), the ship will "hold" the last control signal
+        returned until the end of the game (the controller will not be given a
+        chance to recover).
 
-        ship -- a photonai.world.Ship object for the ship being controlled
+        `world` -- a `photonai.world.World` object containing all known state.
+        Note that the state of some ships may be out-of-date if they
+        are currently obscured by planets - this can be determined by testing
+        if the `obj.update_clock` of an object in the world lags the
+        `world.clock`.
 
-        returns -- a SimpleBot.Control object for the ship being controlled
+        `ship` -- a `photonai.world.Ship` object for the ship being controlled.
+
+        `returns` -- a `SimpleBot.Control` object for the ship being controlled
+        e.g. `SimpleBot.Control(fire=True, rotate=-0.2, thrust=0.6)`.
+
         '''
         raise NotImplementedError
 
@@ -138,7 +159,7 @@ class SubprocessBot(Bot):
 
 class DockerPythonBot(SubprocessBot):
     '''A bot that forwards to an Avro stdin/stdout streaming subprocess
-    in docker.
+    in Docker.
     '''
     def __init__(self, path, container, **args):
         self._container_name = 'bot-%x' % random.randint(0, 1 << 32)

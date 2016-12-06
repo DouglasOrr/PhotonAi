@@ -2,6 +2,7 @@
 
 LIB="photonai/static/lib"
 FONTS="photonai/static/fonts"
+DOC="photonai/static/doc"
 MATERIALIZE="node_modules/materialize-css"
 
 set -e
@@ -9,13 +10,18 @@ set -e
 mkdir -p "${LIB}" "${FONTS}"
 
 npm install
-
-# Hack https://github.com/Dogfalo/materialize/issues/3139
+# hack https://github.com/Dogfalo/materialize/issues/3139
 cp "${MATERIALIZE}/js/date_picker/picker.js" "${MATERIALIZE}/bin"
 
+# js
 browserify scripts/lib.js -o "${LIB}/all.js"
 
+# css
 cat "${MATERIALIZE}/dist/css/materialize.min.css" \
     > "${LIB}/all.css"
 
+# fonts
 cp -r ${MATERIALIZE}/dist/fonts/* "${FONTS}/"
+
+# docs
+env PYTHONPATH=. pdoc photonai --overwrite --html --html-dir "${DOC}"

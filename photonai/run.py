@@ -128,10 +128,12 @@ DEFAULT_CONFIG = dict(
               help='random seed to use for map generation')
 @click.option('-f', '--force', is_flag=True,
               help='replace the output file automatically')
-@click.option('-n', '--repeat-bots', default=1,
+@click.option('-n', '--repeat-bots', type=click.INT,
               help='number of times to repeat the botlist')
-@click.option('-l', '--time-limit', default=60.0,
+@click.option('-l', '--time-limit', type=click.FLOAT,
               help='hard limit on the simulation time for a draw')
+@click.option('-i', '--image', type=click.STRING,
+              help='image to use for running bots')
 def cli(config, **args):
     '''Run a single competitive game with some bots, and save the log.
     '''

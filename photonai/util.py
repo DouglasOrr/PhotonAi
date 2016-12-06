@@ -1,3 +1,6 @@
+'''Some helper utilities for working with 2D vectors.
+'''
+
 import numpy as np
 
 

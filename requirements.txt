@@ -6,5 +6,6 @@ flask
 nose
 nose-parameterized
 numpy
+pdoc
 pymssql
 pyyaml

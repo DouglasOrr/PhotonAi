@@ -3,8 +3,9 @@ __pycache__
 local/
 replays/
 node_modules/
+photonai/static/doc/
+photonai/static/fonts/
 photonai/static/gen/
 photonai/static/lib/
-photonai/static/fonts/
-photonai/static/.webassets-cache/
 photonai/static/.tmp/
+photonai/static/.webassets-cache/

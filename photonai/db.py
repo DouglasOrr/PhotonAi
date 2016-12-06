@@ -1,3 +1,6 @@
+'''SQL server database interface.
+'''
+
 import pymssql
 
 

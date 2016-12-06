@@ -1,3 +1,7 @@
+'''Core game logic (the game engine).
+'''
+
+
 from . import world, util
 import numpy as np
 import itertools as it

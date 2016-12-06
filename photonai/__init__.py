@@ -1,3 +1,8 @@
+'''
+To implement a bot, see `photonai.bot.SimpleBot` and `photonai.world`.
+'''
+
+
 import click
 from photonai import run, server, tourney
 
