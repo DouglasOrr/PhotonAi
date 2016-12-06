@@ -24,6 +24,7 @@ DEFAULT_CONFIG = dict(
         'singleton',
         'orbital',
         'binary',
+        'endtime',
     ],
     time_limit=60,
     step_duration=0.01,
