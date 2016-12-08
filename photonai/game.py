@@ -33,6 +33,19 @@ class _Destroy(Exception):
     pass
 
 
+def _sanitize(control, low, high):
+    '''Sanitize controller input in a way that should handle (NaN).
+    '''
+    if control < low:
+        return low
+    elif control < high:
+        return control
+    elif high <= control:
+        return high
+    else:
+        return 0
+
+
 def _move_body(subject, world_, control, dt):
     '''Compute the new body state of the subject.
 
@@ -54,7 +67,7 @@ def _move_body(subject, world_, control, dt):
     accel = util.Vector.zero()
 
     if control is not None:
-        forward = subject.max_thrust * np.clip(control['thrust'], 0, 1)
+        forward = subject.max_thrust * _sanitize(control['thrust'], 0, 1)
         accel += forward * util.direction(subject.orientation)
 
     # (massless objects experience no gravity)
@@ -84,7 +97,7 @@ def _move_body(subject, world_, control, dt):
 
     # 3. Compute the new orientation
     if control is not None:
-        rotate = subject.max_rotate * np.clip(control['rotate'], -1, 1)
+        rotate = subject.max_rotate * _sanitize(control['rotate'], -1, 1)
         new_orientation = (subject.orientation + dt * rotate) % (2 * np.pi)
     else:
         new_orientation = subject.orientation
@@ -173,7 +186,7 @@ class Simulator:
             if isinstance(obj, world.Ship):
                 state['controller'] = control
                 state['weapon'] = _update_weapon(obj.weapon,
-                                                 control['fire'],
+                                                 bool(control['fire']),
                                                  dt=self._step_duration)
                 if state['weapon']['fired']:
                     yield dict(id=next(self._object_id_gen),
