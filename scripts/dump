@@ -1,0 +1,5 @@
+-- TDSVER=7.0 tsql -S photonai.database.windows.net -D photonai -U douglas@photonai -P PASSWORD -o q < scripts/dump > bots.json
+
+SELECT * FROM bots FOR JSON AUTO
+
+GO
